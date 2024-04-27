@@ -9,6 +9,13 @@ class AuthRequest {
       role: Joi.string().valid('customer', 'admin', 'author').required().default('customer')
     });
   }
+
+  loginRequestSchema() {
+    return Joi.object({
+      email: Joi.string().email().required(),
+      password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+    });
+  }
 }
 
 export default AuthRequest;

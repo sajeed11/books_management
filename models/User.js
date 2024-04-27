@@ -1,4 +1,5 @@
 import db from '../database/db.js'
+import bcrypt from 'bcrypt'
 
 class UserModel {
   // User structure
@@ -29,6 +30,22 @@ class UserModel {
         }
       })
     })
+  }
+
+  static async loginUser(data) {
+    const user = await new Promise((res, rej) =>
+      db.query('SELECT * from users WHERE email = ?', [data.email], (err, result) => {
+        if (!err) {
+          res(result)
+        }
+      }))
+
+    if (user.length > 0) {
+      const auth = await bcrypt.compare(data.password, user[0].password)
+      if (auth) {
+        return user
+      }
+    }
   }
 }
 
