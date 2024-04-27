@@ -1,8 +1,11 @@
 import UserModel from "../models/User.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import AuthRequest from "../request/authRequest.js";
 
 class AuthController {
+
+  // Register user
   static async registerUser(req, res) {
     // Validate request
     const authRequest = new AuthRequest();
@@ -35,9 +38,21 @@ class AuthController {
     var result = await UserModel.registerUser(data)
 
     if (result) {
-      res.status(201).json({ message: 'User registered successfully' })
+      res.status(201).json(
+        {
+          success: true,
+          message: 'User created successfully',
+          data: {
+            username,
+            email,
+            role
+          }
+        }
+      )
     }
   }
+
+  // Login user
 }
 
 export default AuthController;
