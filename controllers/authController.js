@@ -2,7 +2,7 @@ import UserModel from "../models/User.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
-import AuthRequest from "../request/authRequest.js";
+import AuthRequest from "../requests/authRequest.js";
 
 dotenv.config();
 
