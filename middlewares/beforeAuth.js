@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const authMiddleware = (req, res, next) => {
+const beforeAuthMiddleware = (req, res, next) => {
   const token = req.cookies.jwt;
 
   // check the json web token exists & is verified
@@ -12,7 +12,12 @@ const authMiddleware = (req, res, next) => {
       if (err) {
         res.redirect('login');
       } else {
-        next();
+        res.status(200).json(
+          {
+            success: true,
+            message: "User already logged in",
+          }
+        )
       }
     })
   } else {
@@ -20,4 +25,4 @@ const authMiddleware = (req, res, next) => {
   }
 }
 
-export default authMiddleware;
+export default beforeAuthMiddleware;

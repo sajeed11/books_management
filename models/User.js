@@ -21,6 +21,18 @@ class UserModel {
     })
   }
 
+  // Get user by id
+  static async getUserById(id) {
+    console.log(id)
+    return new Promise((res, rej) => {
+      db.query('SELECT * FROM users WHERE id = ?', [id], (err, result) => {
+        if (!err) {
+          res(result)
+        }
+      })
+    })
+  }
+
   // auth
   static async registerUser(data) {
     return new Promise((res, rej) => {

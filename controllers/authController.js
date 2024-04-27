@@ -7,8 +7,8 @@ import AuthRequest from "../requests/authRequest.js";
 dotenv.config();
 
 const maxAge = 3 * 24 * 60 * 60;
-const createToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const createToken = (id, secret) => {
+  return jwt.sign({ id }, secret, {
     expiresIn: maxAge
   })
 }
@@ -64,6 +64,8 @@ class AuthController {
 
   // Login user
   static async loginUser(req, res) {
+    if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Please Login' })
+
     // Validate request 
     const authRequest = new AuthRequest();
     const { error } = authRequest.loginRequestSchema().validate(req.body);
@@ -89,8 +91,16 @@ class AuthController {
     var result = await UserModel.loginUser(data)
 
     if (result) {
-      const token = createToken(result[0].id)
+      const token = createToken(result[0].id, process.env.JWT_SECRET)
       res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
+
+      // create an admin token
+      if (result[0].role === 'admin') {
+        const adminToken = createToken(result[0].id, process.env.ADMIN_JWT_SECRET)
+        res.cookie('admin_jwt', adminToken, { httpOnly: true, maxAge: maxAge * 1000 })
+        console.log('admin token created')
+      }
+
       res.status(200).json(
         {
           success: true,

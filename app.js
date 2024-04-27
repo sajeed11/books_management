@@ -1,8 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import authRoutes from './routes/api/auth.js';
-import userRoutes from './routes/api/user.js'
+import userRoutes from './routes/api/customer.js'
+import adminRoutes from './routes/api/admin.js'
+import authorRoutes from './routes/api/author.js'
 
 // Express app
 const app = express();
@@ -12,10 +13,13 @@ app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }))
 
-// Auth routes
-app.use('/api/auth', authRoutes)
-
-// User routes
+// Customer routes
 app.use('/api/user', userRoutes)
+
+// Admin routes
+app.use('/api/admin', adminRoutes)
+
+// Author routes
+app.use('/api/author', authorRoutes)
 
 app.listen(PORT, () => console.log(`Server running on port: http://localhost:${PORT}`));
