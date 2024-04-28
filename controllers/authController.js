@@ -1,4 +1,5 @@
 import UserModel from "../models/User.js";
+import AuthorModel from "../models/Author.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
@@ -17,6 +18,9 @@ class AuthController {
 
   // Register user
   static async registerUser(req, res) {
+    // Check if request method is POST
+    if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Please Register' })
+
     // Validate request
     const authRequest = new AuthRequest();
     const { error } = authRequest.registerRequestSchema().validate(req.body);
@@ -32,31 +36,91 @@ class AuthController {
       });
     }
 
-    const { username, email, password, role } = req.body;
+    const data = req.body;
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
 
-    const data = {
-      username,
-      email,
+    // User data for both tables
+    const userData = {
+      username: data.username,
+      email: data.email,
       password: hashedPassword,
-      role
-    }
+      role: data.role
+    };
 
-    var result = await UserModel.registerUser(data)
+    // Create user
+    var result = await UserModel.registerUser(userData)
 
     if (result) {
-      res.status(201).json(
+
+      // Check if user is an author and create it with the same id
+      if (data.role === 'author') {
+        const authorData = {
+          id: result.id,
+          name: data.name,
+          biography: data.biography
+        }
+
+        var authorResult = await AuthorModel.addAuthor(authorData)
+
+        if (authorResult) {
+          return res.status(201).json(
+            {
+              success: true,
+              message: 'Author created successfully',
+              data: {
+                username,
+                email,
+                role,
+                authorData: {
+                  name: data.name,
+                  biography: data.biography
+                }
+              }
+            }
+          )
+        } else {
+          return res.status(400).json(
+            {
+              success: false,
+              message: 'Author not created'
+            }
+          )
+        }
+      } else {
+        if (data.role === 'admin') {
+          return res.status(201).json(
+            {
+              success: true,
+              message: 'Admin created successfully',
+              data: {
+                username,
+                email,
+                role
+              }
+            }
+          )
+        } else {
+          return res.status(201).json(
+            {
+              success: true,
+              message: 'User created successfully',
+              data: {
+                username,
+                email,
+                role
+              }
+            }
+          )
+        }
+      }
+    } else {
+      return res.status(400).json(
         {
-          success: true,
-          message: 'User created successfully',
-          data: {
-            username,
-            email,
-            role
-          }
+          success: false,
+          message: 'User not created'
         }
       )
     }

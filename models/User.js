@@ -34,7 +34,7 @@ class UserModel {
   }
 
   // auth
-  static async registerUser(data) {
+  static async registerUser(userData) {
     return new Promise((res, rej) => {
       db.query('INSERT INTO users SET ?', data, (err, result) => {
         if (!err) {
