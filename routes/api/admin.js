@@ -26,9 +26,10 @@ router.delete('/users/:id', userController.delete)
 
 // Admin with Books
 router.get('/books', bookController.readAll) // authMiddleware, adminMiddleware,
-router.get('/books/:id', authMiddleware, adminMiddleware, bookController.readById)
+router.get('/books/:id', bookController.readById) // authMiddleware, adminMiddleware,
 router.post('/books', bookController.createBook) //authMiddleware, adminMiddleware,
 router.put('/books/:id', bookController.approveBook) //authMiddleware, adminMiddleware,
+router.delete('/books/:id', bookController.delete) //authMiddleware, adminMiddleware,
 
 // Admin with Authors
 router.get('/authors', authMiddleware, adminMiddleware, authorController.readAll)

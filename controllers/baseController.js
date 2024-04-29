@@ -1,6 +1,6 @@
 import httpStatus from "http-status"; // For standardized HTTP status codes
 import autoBind from 'auto-bind';
-import BaseRequest from "../requests/requestBase.js";
+import { ByIdRequest } from '../requests/requestBase.js';
 
 class BaseController {
   constructor(model) {
@@ -53,13 +53,16 @@ class BaseController {
 
   async readById(req, res) {
     // Validate the request
-    const request = new BaseRequest()
-    const { error } = request.getElementByIdRequest().validate(req.params)
+    const { error } = ByIdRequest().validate(req.params)
 
     if (error) {
       return res.status(400).json({
         success: false,
-        message: error.message
+        error: {
+          message: error.details[0].message,
+          type: error.details[0].type,
+          context: error.details[0].context
+        }
       })
     }
 
@@ -109,13 +112,16 @@ class BaseController {
 
   async delete(req, res) {
     // Validate the request
-    const request = new BaseRequest()
-    const { error } = request.getElementByIdRequest().validate(req.params)
+    const { error } = ByIdRequest().validate(req.params)
 
     if (error) {
       return res.status(400).json({
         success: false,
-        message: error.message
+        error: {
+          message: error.details[0].message,
+          type: error.details[0].type,
+          context: error.details[0].context
+        }
       })
     }
 

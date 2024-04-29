@@ -35,16 +35,29 @@ class BookController extends BaseController {
     // We set the author_request_status to pending automatically
     data.author_request_status = 'pending'
 
-    var result = await bookModel.create(data)
-    console.log(result)
+    try {
+      var result = await bookModel.create(data)
+      // console.log(result)
 
-    if (result) {
-      res.status(httpStatus.CREATED)
+      if (result) {
+        res.status(httpStatus.CREATED)
+          .json(
+            {
+              success: true,
+              message: 'Book created successfully',
+              data: data
+            }
+          )
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(httpStatus.INTERNAL_SERVER_ERROR)
         .json(
           {
-            success: true,
-            message: 'Book created successfully',
-            data: data
+            success: false,
+            error: {
+              message: 'Internal server error'
+            }
           }
         )
     }
@@ -73,7 +86,7 @@ class BookController extends BaseController {
     try {
       var book = await bookModel.readById(req.params.id)
 
-      if (!book) {
+      if (!book[0]) {
         return res.status(httpStatus.NOT_FOUND)
           .json(
             {
@@ -97,7 +110,9 @@ class BookController extends BaseController {
       res.status(httpStatus.INTERNAL_SERVER_ERROR)
         .json({
           success: false,
-          message: 'Internal server error'
+          error: {
+            message: 'Internal server error'
+          }
         })
     }
 
@@ -119,7 +134,9 @@ class BookController extends BaseController {
         .json(
           {
             success: false,
-            message: 'Internal server error'
+            error: {
+              message: 'Internal server error'
+            }
           }
         )
     }
