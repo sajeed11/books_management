@@ -12,4 +12,10 @@ function createBookRequestSchema() {
   })
 }
 
-export { createBookRequestSchema }
+function approveBookRequestSchema() {
+  return Joi.object({
+    id: Joi.number().required()
+  })
+}
+
+export { createBookRequestSchema, approveBookRequestSchema }

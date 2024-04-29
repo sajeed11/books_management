@@ -1,7 +1,8 @@
+import httpStatus from "http-status"; // For standardized HTTP status codes
 import autoBind from 'auto-bind'
 import BookModel from '../models/Book.js'
 import BaseController from './baseController.js'
-import { createBookRequestSchema } from '../requests/requestBook.js'
+import { createBookRequestSchema, approveBookRequestSchema } from '../requests/requestBook.js'
 
 class BookController extends BaseController {
 
@@ -16,16 +17,17 @@ class BookController extends BaseController {
     const { error } = createBookRequestSchema().validate(req.body)
 
     if (error) {
-      return res.status(400).json(
-        {
-          success: false,
-          error: {
-            message: error.details[0].message,
-            type: error.details[0].type,
-            context: error.details[0].context
+      return res.status(httpStatus.BAD_REQUEST)
+        .json(
+          {
+            success: false,
+            error: {
+              message: error.details[0].message,
+              type: error.details[0].type,
+              context: error.details[0].context
+            }
           }
-        }
-      )
+        )
     }
 
     const data = req.body
@@ -37,68 +39,89 @@ class BookController extends BaseController {
     console.log(result)
 
     if (result) {
-      res.status(201).json(
-        {
-          success: true,
-          message: 'Book created successfully',
-          data: data
-        }
-      )
+      res.status(httpStatus.CREATED)
+        .json(
+          {
+            success: true,
+            message: 'Book created successfully',
+            data: data
+          }
+        )
     }
   }
 
   // Approve a book
   async approveBook(req, res) {
-    // Validate the id
-    if (!req.params.id) {
-      res.status(400).json(
-        {
-          success: false,
-          message: 'Please provide a book id'
-        }
-      )
-      return
+    // Validate the request
+    const { error } = approveBookRequestSchema().validate(req.params)
+
+    if (error) {
+      return res.status(httpStatus.BAD_REQUEST)
+        .json(
+          {
+            success: false,
+            error: {
+              message: error.details[0].message,
+              type: error.details[0].type,
+              context: error.details[0].context
+            }
+          }
+        )
     }
 
-    var id = req.params.id
-
     // We check if the book exists then if it not approved yet
-    var book = await bookModel.readById(id)
+    try {
+      var book = await bookModel.readById(req.params.id)
 
-    if (book) {
-      if (book.author_request_status === 'pending') {
-        var result = await BookModel.approveBook(id)
+      if (!book) {
+        return res.status(httpStatus.NOT_FOUND)
+          .json(
+            {
+              success: false,
+              message: 'Book not found'
+            }
+          )
+      }
 
-        if (result) {
-          res.status(200).json(
+      if (book[0].author_request_status === 'none') {
+        return res.status(httpStatus.BAD_REQUEST)
+          .json(
+            {
+              success: false,
+              message: 'Book already approved'
+            }
+          )
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json({
+          success: false,
+          message: 'Internal server error'
+        })
+    }
+
+    try {
+      var result = await bookModel.update(req.params.id, { author_request_status: 'none' })
+
+      if (result) {
+        res.status(httpStatus.OK)
+          .json(
             {
               success: true,
               message: 'Book approved successfully'
             }
           )
-        } else {
-          res.status(400).json(
-            {
-              success: false,
-              message: 'Failed to approve book'
-            }
-          )
-        }
-      } else {
-        res.status(400).json(
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json(
           {
             success: false,
-            message: 'Book already approved'
+            message: 'Internal server error'
           }
         )
-      }
-    } else {
-      res.status(400).json(
-        {
-          success: false,
-          message: 'Failed to approve book'
-        }
-      )
     }
   }
 }
