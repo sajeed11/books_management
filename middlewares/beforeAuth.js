@@ -10,7 +10,7 @@ const beforeAuthMiddleware = (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
       if (err) {
-        res.redirect('login');
+        res.redirect('login')
       } else {
         res.status(200).json(
           {
@@ -21,7 +21,7 @@ const beforeAuthMiddleware = (req, res, next) => {
       }
     })
   } else {
-    res.redirect('login');
+    next();
   }
 }
 

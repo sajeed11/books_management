@@ -1,64 +1,33 @@
 import db from '../database/db.js'
 import bcrypt from 'bcrypt'
+import BaseModel from './BaseModel.js'
 
-class UserModel {
-  // User structure
-  constructor(user) {
-    this.username = user.username;
-    this.password = user.password;
-    this.email = user.email;
-    this.role = user.role;
-  }
+class UserModel extends BaseModel {
 
-  // Get all users
-  static async index() {
-    return new Promise((res, rej) => {
-      db.query('SELECT * FROM users', (err, result) => {
-        if (!err) {
-          res(result)
-        }
-      })
-    })
-  }
-
-  // Get user by id
-  static async getUserById(id) {
-    console.log(id)
-    return new Promise((res, rej) => {
-      db.query('SELECT * FROM users WHERE id = ?', [id], (err, result) => {
-        if (!err) {
-          res(result)
-        }
-      })
-    })
+  constructor() {
+    super('users')
   }
 
   // auth
-  static async registerUser(userData) {
-    return new Promise((res, rej) => {
-      db.query('INSERT INTO users SET ?', data, (err, result) => {
-        if (!err) {
-          res(result)
-        }
-      })
-    })
+  static async registerUser(data) {
+    const user = await db.query('INSERT INTO users SET ?', [data])
+
+    return user
   }
 
   static async loginUser(data) {
-    const user = await new Promise((res, rej) =>
-      db.query('SELECT * from users WHERE email = ?', [data.email], (err, result) => {
-        if (!err) {
-          res(result)
-        }
-      }))
+    const [user] = await db.query('SELECT * FROM users WHERE email = ?', [data.email])
 
     if (user.length > 0) {
       const auth = await bcrypt.compare(data.password, user[0].password)
       if (auth) {
         return user
+      } else {
+        throw new Error('Incorrect password')
       }
     }
+    throw new Error('Email does not exist')
   }
 }
 
-export default UserModel;
+export default UserModel
