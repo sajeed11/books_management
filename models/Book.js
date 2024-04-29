@@ -1,62 +1,33 @@
+import autoBind from 'auto-bind'
 import db from '../database/db.js'
+import BaseModel from './BaseModel.js'
 
-class BookModel {
-
-
-  static async index() {
-    return new Promise((res, rej) => {
-      db.query('SELECT * FROM books', (err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(result);
-      })
-    })
+class BookModel extends BaseModel {
+  constructor(table) {
+    super(table)
+    this.table = table
+    autoBind(this)
   }
 
-  static async getAllBooks() {
-    return new Promise((res, rej) => {
-      db.query('SELECT * FROM users WHERE author_request_status = "none" ', (err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(result);
-      })
-    })
-  }
 
-  static async getBookById(id) {
-    return new Promise((res, rej) => {
-      db.query('SELECT * FROM books WHERE id = ?', [id], (err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(result);
-      })
-    })
-  }
+  // async function getAllBooks() {
+  //   const [books] = await db.query('SELECT * FROM books WHERE author_request_status = "none"')
 
-  static async createBook(data) {
-    return new Promise((res, rej) => {
-      db.query('INSERT INTO books SET ?', [data], (err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(result);
-      })
-    })
-  }
+  //   return books
+  // }
 
-  static async approveBook(id) {
-    return new Promise((res, rej) => {
-      db.query('UPDATE books SET author_request_status = "none" WHERE id = ?', [id], (err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(result);
-      })
-    })
+
+  // async function createBook(data) {
+  //   const [book] = db.query('INSERT INTO books SET ?', [data])
+
+  //   return book
+  // }
+
+  async approveBook(id) {
+    const [book] = await db.query('UPDATE books SET author_request_status = "approved" WHERE id = ?', [id])
+
+    return book
   }
 }
 
-export default BookModel;
+export default BookModel

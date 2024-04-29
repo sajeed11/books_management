@@ -1,40 +1,39 @@
 // Purpose: User controller to handle user related operations
+import autoBind from 'auto-bind'
 import UserModel from "../models/User.js";
 import UserRequest from "../requests/requestUser.js";
-class UserController {
+import BaseController from '../controllers/baseController.js'
+class UserController extends BaseController {
 
-  static async index(req, res) {
-    var result = await UserModel.index()
-
-    if (result) {
-      res.status(200).json({
-        success: true,
-        data: result
-      })
-    }
+  constructor(model) {
+    super(model)
+    autoBind(this)
   }
 
-  static async getUserById(req, res) {
-    // Validate the request
-    const userRequest = new UserRequest();
-    const { error } = userRequest.getUserByIdRequestSchema().validate(req.params);
 
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message
-      })
-    }
+  // static async getUserById(req, res) {
+  //   // Validate the request
+  //   const userRequest = new UserRequest();
+  //   const { error } = userRequest.getUserByIdRequestSchema().validate(req.params);
 
-    var result = await UserModel.getUserById(req.params.id)
+  //   if (error) {
+  //     return res.status(400).json({
+  //       success: false,
+  //       message: error.message
+  //     })
+  //   }
 
-    if (result) {
-      res.status(200).json({
-        success: true,
-        data: result
-      })
-    }
-  }
+  //   var result = await UserModel.getUserById(req.params.id)
+
+  //   if (result) {
+  //     res.status(200).json({
+  //       success: true,
+  //       data: result
+  //     })
+  //   }
+  // }
 }
 
-export default UserController;
+const userModel = new UserModel('users')
+
+export default new UserController(userModel)

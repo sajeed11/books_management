@@ -16,8 +16,8 @@ router.get('/login', authController.loginUser);
 router.post('/register', authController.registerUser);
 router.post('/login', beforeAuthMiddleware, authController.loginUser);
 
-router.get('/books', authMiddleware, bookController.getAllBooks)
-router.get('/books/:id', authMiddleware, bookController.getBookById)
-router.post('/books', authMiddleware, bookController.createBook)
+router.get('/books', authMiddleware, bookController.readAll)
+router.get('/books/:id', authMiddleware, bookController.readById)
+router.post('/books', authMiddleware, bookController.create)
 
 export default router;

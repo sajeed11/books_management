@@ -1,16 +1,23 @@
 import db from '../database/db.js'
+import BaseModel from './BaseModel.js'
 
-class AuthorModel {
+class AuthorModel extends BaseModel {
 
-  static async index() {
-    return new Promise((res, rej) => {
-      db.query('SELECT * FROM authors', (err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(result);
-      })
-    })
+  constructor() {
+    super('authors')
   }
 }
-export default AuthorModel;
+
+// async function addAuthor(data) {
+//   const [author] = db.query('INSERT INTO authors SET ?', [data])
+
+//   return author
+// }
+
+// async function deleteAuthor(id) {
+//   const [author] = db.query('DELETE FROM authors WHERE id = ?', [id])
+
+//   return author
+// }
+
+export default AuthorModel

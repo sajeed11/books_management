@@ -15,8 +15,9 @@ router.get('/register', authController.registerUser);
 router.get('/login', authController.loginUser);
 router.post('/register', authController.registerUser);
 router.post('/login', beforeAuthMiddleware, authController.loginUser);
+router.get('/logout', authController.logoutUser);
 
-router.get('/books', authMiddleware, bookController.getAllBooks)
-router.get('/books/:id', authMiddleware, bookController.getBookById)
+// router.get('/books', authMiddleware, bookController.getAllBooks)
+// router.get('/books/:id', authMiddleware, bookController.getBookById)
 
 export default router;

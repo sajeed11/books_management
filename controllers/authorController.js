@@ -1,38 +1,14 @@
+import autoBind from "auto-bind";
 import AuthorModel from "../models/Author.js";
+import BaseController from "./baseController.js";
 
-class AuthorController {
+class AuthorController extends BaseController {
 
-  static async index(req, res) {
-
-    var result = await AuthorModel.index()
-
-    if (result) {
-      if (result.length > 0) {
-        res.status(200).json(
-          {
-            success: true,
-            message: 'Authors retrieved successfully',
-            data: result
-          }
-        )
-      } else {
-        res.status(404).json(
-          {
-            success: false,
-            message: 'No authors found'
-          }
-        )
-      }
-    } else {
-      res.status(400).json(
-        {
-          success: false,
-          message: 'Failed to retrieve books'
-        }
-      )
-    }
+  constructor(model) {
+    super(model)
+    autoBind(this)
   }
-
 }
+const authorModel = new AuthorModel('authors')
 
-export default AuthorController;
+export default new AuthorController(authorModel)

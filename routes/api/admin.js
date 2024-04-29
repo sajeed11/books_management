@@ -1,9 +1,10 @@
 import express from 'express';
+
 // Controllers
 import authController from '../../controllers/authController.js';
 import userController from '../../controllers/userController.js';
 import bookController from '../../controllers/bookController.js';
-import AuthorController from '../../controllers/authorController.js';
+import authorController from '../../controllers/authorController.js';
 
 // Middlewares
 import authMiddleware from '../../middlewares/authMiddleware.js';
@@ -19,16 +20,19 @@ router.post('/register', authController.registerUser);
 router.post('/login', beforeAuthMiddleware, authController.loginUser);
 
 // Admin with Users
-router.get('/users', authMiddleware, adminMiddleware, userController.index)
-router.get('/users/:id', authMiddleware, adminMiddleware, userController.getUserById)
+router.get('/users', userController.readAll) // authMiddleware, adminMiddleware,
+router.get('/users/:id', userController.readById) // authMiddleware, adminMiddleware,
+router.delete('/users/:id', userController.delete)
 
 // Admin with Books
-router.get('/books', authMiddleware, adminMiddleware, bookController.index)
-router.get('/books/:id', authMiddleware, adminMiddleware, bookController.getBookById)
-router.post('/books', authMiddleware, adminMiddleware, bookController.createBook)
-router.put('/books/:id', authMiddleware, adminMiddleware, bookController.approveBook)
+router.get('/books', bookController.readAll) // authMiddleware, adminMiddleware,
+router.get('/books/:id', authMiddleware, adminMiddleware, bookController.readById)
+router.post('/books', bookController.createBook) //authMiddleware, adminMiddleware,
+router.put('/books/:id', bookController.approveBook) //authMiddleware, adminMiddleware,
 
 // Admin with Authors
-router.get('/authors', authMiddleware, adminMiddleware, AuthorController.index)
+router.get('/authors', authMiddleware, adminMiddleware, authorController.readAll)
+router.get('/authors/:id', authMiddleware, adminMiddleware, authorController.readById)
+// router.delete('./author/:id', authMiddleware, adminMiddleware, authorController.deleteAuthor)
 
 export default router;
