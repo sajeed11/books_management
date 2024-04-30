@@ -5,6 +5,7 @@ import authController from '../../controllers/authController.js';
 import userController from '../../controllers/userController.js';
 import bookController from '../../controllers/bookController.js';
 import authorController from '../../controllers/authorController.js';
+import genreController from '../../controllers/genreController.js';
 
 // Middlewares
 import authMiddleware from '../../middlewares/authMiddleware.js';
@@ -35,6 +36,10 @@ router.delete('/books/:id', bookController.delete) //authMiddleware, adminMiddle
 // Admin with Authors
 router.get('/authors', authorController.readAll) // authMiddleware, adminMiddleware, 
 router.get('/authors/:id', authorController.readById) //authMiddleware, adminMiddleware,
-router.delete('./author/:id', authorController.delete) //authMiddleware, adminMiddleware, 
+router.delete('/author/:id', authorController.delete) //authMiddleware, adminMiddleware, 
+
+// Admin with Genres
+router.get('/genres', genreController.readAll) // authMiddleware, adminMiddleware,
+router.get('/genres/:id', genreController.readById) // authMiddleware, adminMiddleware,
 
 export default router;
