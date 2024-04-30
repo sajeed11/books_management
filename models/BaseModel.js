@@ -19,6 +19,10 @@ class BaseModel {
 
       try {
         await connection.query('INSERT INTO ?? SET ?', [this.tableName, data]);
+        // console.log(result)
+
+        // const newId = result[0].insertId
+        // console.log(newId)
 
         await connection.commit();
         return true
@@ -34,29 +38,43 @@ class BaseModel {
     }
   }
 
-  async readAll() {
-    const connection = await db.getConnection();
+  async readAll(condition = null) {
+    const connection = await db.getConnection()
 
     try {
-      const result = await connection.query(`SELECT * FROM ??`, [this.tableName]);
-      // console.log(result);
-      return result[0];
+      let query = `SELECT * FROM ??`
+      const params = [this.tableName]
+
+      if (condition) {
+        // Build the query with the provided condition
+        query += ` WHERE ?`
+        params.push(condition)
+      }
+
+      const result = await connection.query(query, params)
+      return result[0]
+
     } catch (error) {
-      console.error('Error reading data:', error);
+      console.error('Error reading data:', error)
       throw error; // Re-throw for handling in the controller
     } finally {
-      connection.release();
+      connection.release()
     }
   }
 
-  async readById(id) {
+  async readById(id, condition = null) {
     const connection = await db.getConnection();
 
     try {
-      const result = await connection.query(`SELECT * FROM ?? WHERE id = ?`, [
-        this.tableName,
-        id,
-      ]);
+      let query = `SELECT * FROM ?? WHERE id = ?`;
+      const params = [this.tableName, id];
+
+      if (condition) {
+        query += `AND ?`
+        params.push(condition)
+      }
+
+      const result = await connection.query(query, params)
       return result[0] || null; // Return first row or null if not found
     } catch (error) {
       console.error('Error reading data by ID:', error);

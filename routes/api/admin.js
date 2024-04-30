@@ -14,10 +14,11 @@ import beforeAuthMiddleware from '../../middlewares/beforeAuth.js';
 const router = express.Router();
 
 // Auth routes
-router.get('/register', authController.registerUser);
-router.get('/login', authController.loginUser);
-router.post('/register', authController.registerUser);
-router.post('/login', beforeAuthMiddleware, authController.loginUser);
+router.get('/register', authController.register);
+router.get('/login', authController.login);
+router.post('/register', authController.register);
+router.post('/login', authController.login); // beforeAuthMiddleware
+router.get('/logout', authController.logout)
 
 // Admin with Users
 router.get('/users', userController.readAll) // authMiddleware, adminMiddleware,
@@ -34,6 +35,6 @@ router.delete('/books/:id', bookController.delete) //authMiddleware, adminMiddle
 // Admin with Authors
 router.get('/authors', authMiddleware, adminMiddleware, authorController.readAll)
 router.get('/authors/:id', authMiddleware, adminMiddleware, authorController.readById)
-// router.delete('./author/:id', authMiddleware, adminMiddleware, authorController.deleteAuthor)
+router.delete('./author/:id', authorController.delete) //authMiddleware, adminMiddleware, 
 
 export default router;

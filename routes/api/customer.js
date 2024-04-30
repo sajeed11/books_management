@@ -11,13 +11,13 @@ import beforeAuthMiddleware from '../../middlewares/beforeAuth.js';
 const router = express.Router();
 
 // Auth routes
-router.get('/register', authController.registerUser);
-router.get('/login', authController.loginUser);
-router.post('/register', authController.registerUser);
-router.post('/login', beforeAuthMiddleware, authController.loginUser);
-router.get('/logout', authController.logoutUser);
+router.get('/register', authController.register);
+router.get('/login', authController.login);
+router.post('/register', authController.register);
+router.post('/login', beforeAuthMiddleware, authController.login);
+router.get('/logout', authController.logout);
 
-// router.get('/books', authMiddleware, bookController.getAllBooks)
-// router.get('/books/:id', authMiddleware, bookController.getBookById)
+router.get('/books', authMiddleware, bookController.readAll)
+router.get('/books/:id', authMiddleware, bookController.readById)
 
 export default router;

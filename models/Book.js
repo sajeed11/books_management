@@ -10,10 +10,16 @@ class BookModel extends BaseModel {
   }
 
 
-  // async function getAllBooks() {
-  //   const [books] = await db.query('SELECT * FROM books WHERE author_request_status = "none"')
+  // async getAll() {
+  //   const connection = db.getConnection()
 
-  //   return books
+  //   try {
+  //     const result = await db.query('SELECT * FROM ?? WHERE author_request_status = "none"', [this.tableName])
+
+  //     return result[0]
+  //   } catch (error) {
+  //     console.log('Error redaing data:', error)
+  //   }
   // }
 
 

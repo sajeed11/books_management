@@ -111,7 +111,7 @@ class BookController extends BaseController {
         .json({
           success: false,
           error: {
-            message: 'Internal server error'
+            message: error.message
           }
         })
     }

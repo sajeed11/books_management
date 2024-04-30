@@ -26,8 +26,16 @@ class BaseController {
   }
 
   async readAll(req, res) {
+
+    console.log(req)
+
     try {
-      const data = await this.model.readAll();
+
+      let data;
+      if (req.baseUrl.includes('api/user')) {
+        data = await this.model.readAll({ author_request_status: 'none' })
+      } else data = await this.model.readAll();
+
       if (!data.length) {
         return res.status(httpStatus.NOT_FOUND)
           .json(
@@ -56,14 +64,15 @@ class BaseController {
     const { error } = ByIdRequest().validate(req.params)
 
     if (error) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          message: error.details[0].message,
-          type: error.details[0].type,
-          context: error.details[0].context
-        }
-      })
+      return res.status(400)
+        .json({
+          success: false,
+          error: {
+            message: error.details[0].message,
+            type: error.details[0].type,
+            context: error.details[0].context
+          }
+        })
     }
 
     try {
