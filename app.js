@@ -1,7 +1,7 @@
 import express from "express"
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import userRoutes from './routes/api/customer.js'
+import customerRoutes from './routes/api/customer.js'
 import adminRoutes from './routes/api/admin.js'
 import authorRoutes from './routes/api/author.js'
 
@@ -14,7 +14,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }))
 
 // Customer routes
-app.use('/api/user', userRoutes)
+app.use('/api/customer', customerRoutes)
 
 // Admin routes
 app.use('/api/admin', adminRoutes)
