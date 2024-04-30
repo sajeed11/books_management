@@ -27,11 +27,9 @@ class BaseController {
 
   async readAll(req, res) {
 
-    console.log(req)
-
     try {
-
       let data;
+
       if (req.baseUrl.includes('api/user')) {
         data = await this.model.readAll({ author_request_status: 'none' })
       } else data = await this.model.readAll();
@@ -76,8 +74,13 @@ class BaseController {
     }
 
     try {
-      const id = req.params.id;
-      const data = await this.model.readById(id);
+      const id = req.params.id
+      let data
+
+      if (req.baseUrl.includes('api/user/books')) {
+        data = await this.model.readById(id, { author_request_status: 'none' })
+      } else data = await this.model.readById(id);
+
       if (!data.length) {
         return res.status(httpStatus.NOT_FOUND)
           .json(

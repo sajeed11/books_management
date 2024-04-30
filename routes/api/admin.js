@@ -33,8 +33,8 @@ router.put('/books/:id', bookController.approveBook) //authMiddleware, adminMidd
 router.delete('/books/:id', bookController.delete) //authMiddleware, adminMiddleware,
 
 // Admin with Authors
-router.get('/authors', authMiddleware, adminMiddleware, authorController.readAll)
-router.get('/authors/:id', authMiddleware, adminMiddleware, authorController.readById)
+router.get('/authors', authorController.readAll) // authMiddleware, adminMiddleware, 
+router.get('/authors/:id', authorController.readById) //authMiddleware, adminMiddleware,
 router.delete('./author/:id', authorController.delete) //authMiddleware, adminMiddleware, 
 
 export default router;
