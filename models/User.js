@@ -1,4 +1,3 @@
-import db from '../database/db.js'
 import autoBind from 'auto-bind'
 import bcrypt from 'bcrypt'
 import BaseModel from './BaseModel.js'
@@ -11,20 +10,15 @@ class UserModel extends BaseModel {
     autoBind(this)
   }
 
-
-  async getConnection() {
-    return await db.getConnection();
-  }
-
   // auth
-  static async registerUser(userData, authorData) {
-    const connection = await db.getConnection()
+  async registerUser(userData, authorData) {
+    const connection = await this.getConnection()
 
     try {
       await connection.beginTransaction()
 
       try {
-        const userResult = await connection.query('INSERT INTO users SET ?', [userData])
+        const userResult = await connection.query('INSERT INTO ?? SET ?', [this.tableName, userData])
         const userId = userResult[0].insertId
 
         // console.log(userId)
@@ -47,18 +41,26 @@ class UserModel extends BaseModel {
     }
   }
 
-  static async loginUser(data) {
-    const [user] = await db.query('SELECT * FROM users WHERE email = ?', [data.email])
+  async loginUser(data) {
+    const connection = await this.getConnection()
 
-    if (user.length > 0) {
-      const auth = await bcrypt.compare(data.password, user[0].password)
-      if (auth) {
-        return user
-      } else {
-        throw new Error('Incorrect password')
+    try {
+      const [user] = await connection.query('SELECT * FROM ?? WHERE email = ?', [this.tableName, data.email])
+
+      if (user.length > 0) {
+        const auth = await bcrypt.compare(data.password, user[0].password)
+        if (auth) {
+          return user
+        } else {
+          throw new Error('Incorrect password')
+        }
       }
+    } catch (error) {
+      console.error('Error reading data:', error)
+      throw error
+    } finally {
+      connection.release()
     }
-    throw new Error('Email does not exist')
   }
 }
 

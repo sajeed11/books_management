@@ -12,32 +12,32 @@ class BaseModel {
   }
 
   async create(data) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection()
 
     try {
-      await connection.beginTransaction();
+      await connection.beginTransaction()
 
       try {
         const result = await connection.query('INSERT INTO ?? SET ?', [this.tableName, data]);
         const newId = result[0].insertId
         console.log(newId)
 
-        await connection.commit();
+        await connection.commit()
         return newId
       } catch (error) {
-        await connection.rollback();
+        await connection.rollback()
         throw error;
       } finally {
-        connection.release();
+        connection.release()
       }
     } catch (error) {
-      console.error('Error creating data:', error);
-      throw error; // Re-throw for handling in the controller
+      console.error('Error creating data:', error)
+      throw error // Re-throw for handling in the controller
     }
   }
 
   async readAll(condition = null) {
-    const connection = await db.getConnection()
+    const connection = await this.getConnection()
 
     try {
       let query = `SELECT * FROM ??`
@@ -61,10 +61,10 @@ class BaseModel {
   }
 
   async readById(id, condition = null) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection()
 
     try {
-      let query = `SELECT * FROM ?? WHERE id = ?`;
+      let query = `SELECT * FROM ?? WHERE id = ?`
       const params = [this.tableName, id];
 
       if (condition) {
@@ -75,53 +75,53 @@ class BaseModel {
       const result = await connection.query(query, params)
       return result[0] || null; // Return first row or null if not found
     } catch (error) {
-      console.error('Error reading data by ID:', error);
-      throw error; // Re-throw for handling in the controller
+      console.error('Error reading data by ID:', error)
+      throw error // Re-throw for handling in the controller
     } finally {
-      connection.release();
+      connection.release()
     }
   }
 
   async update(id, data) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection()
 
     try {
-      await connection.beginTransaction();
+      await connection.beginTransaction()
 
       try {
         await connection.query('UPDATE ?? SET ? WHERE id = ?', [this.tableName, data, id]);
-        await connection.commit();
+        await connection.commit()
         return true;
       } catch (error) {
-        await connection.rollback();
-        throw error;
+        await connection.rollback()
+        throw error
       } finally {
-        connection.release();
+        connection.release()
       }
     } catch (error) {
-      console.error('Error updating data:', error);
+      console.error('Error updating data:', error)
       throw error; // Re-throw for handling in the controller
     }
   }
 
   async delete(id) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection()
 
     try {
-      await connection.beginTransaction();
+      await connection.beginTransaction()
 
       try {
         await connection.query('DELETE FROM ?? WHERE id = ?', [this.tableName, id]);
-        await connection.commit();
-        return true;
+        await connection.commit()
+        return true
       } catch (error) {
-        await connection.rollback();
-        throw error;
+        await connection.rollback()
+        throw error
       } finally {
-        connection.release();
+        connection.release()
       }
     } catch (error) {
-      console.error('Error deleting data:', error);
+      console.error('Error deleting data:', error)
       throw error; // Re-throw for handling in the controller
     }
   }

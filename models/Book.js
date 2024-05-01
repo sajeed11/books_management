@@ -1,5 +1,4 @@
 import autoBind from 'auto-bind'
-import db from '../database/db.js'
 import BaseModel from './BaseModel.js'
 
 class BookModel extends BaseModel {
@@ -30,9 +29,18 @@ class BookModel extends BaseModel {
   // }
 
   async approveBook(id) {
-    const [book] = await db.query('UPDATE books SET author_request_status = "approved" WHERE id = ?', [id])
+    const connection = await this.getConnection()
 
-    return book
+    try {
+      const [book] = await connection.query('UPDATE books SET author_request_status = "approved" WHERE id = ?', [id])
+
+      return book
+    } catch (error) {
+      console.log('Error approving book:', error)
+      throw error
+    } finally {
+      connection.release()
+    }
   }
 }
 
