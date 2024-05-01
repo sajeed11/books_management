@@ -3,7 +3,7 @@ import autoBind from 'auto-bind'
 import BookModel from '../models/Book.js'
 import BaseController from './baseController.js'
 import { createBookRequestSchema, approveBookRequestSchema, updateBookRequestSchema } from '../requests/requestBook.js'
-import { ByIdRequest } from "../requests/requestBase.js";
+import { ByIdRequest, ByTwoIdRequest } from "../requests/requestBase.js";
 import AuthorRequestModel from "../models/AuthorRequest.js";
 
 const authorRequestModel = new AuthorRequestModel('author_requests')
@@ -46,14 +46,12 @@ class BookController extends BaseController {
       if (result) {
         try {
 
-          await authorRequestModel.create(
-            {
-              book_id: result,
-              author_id: req.body.author_id,
-              request_type: 'create',
-              status: 'pending',
-            }
-          )
+          await authorRequestModel.create({
+            book_id: result,
+            author_id: req.body.author_id,
+            request_type: 'create',
+            status: 'pending',
+          })
 
           return res.status(httpStatus.CREATED)
             .json(
@@ -218,9 +216,23 @@ class BookController extends BaseController {
             }
           )
       }
+
+      // We check if the author is the owner of the book
+      if (book[0].author_id !== req.body.author_id) {
+        return res.status(httpStatus.FORBIDDEN)
+          .json(
+            {
+              success: false,
+              error: {
+                message: 'You are not allowed to update this book'
+              }
+            }
+          )
+      }
+
     } catch (error) {
       console.log(error)
-      res.status(httpStatus.INTERNAL_SERVER_ERROR)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR)
         .json({
           success: false,
           error: {
@@ -237,13 +249,33 @@ class BookController extends BaseController {
       console.log(result)
 
       if (result) {
-        res.status(httpStatus.OK)
-          .json(
-            {
-              success: true,
-              message: 'Book updated successfully'
-            }
-          )
+        try {
+
+          await authorRequestModel.create({
+            book_id: id,
+            author_id: req.body.author_id,
+            request_type: 'update',
+            status: 'pending',
+          })
+
+          return res.status(httpStatus.OK)
+            .json(
+              {
+                success: true,
+                message: 'Book updated successfully'
+              }
+            )
+        } catch (error) {
+          return res.status(httpStatus.INTERNAL_SERVER_ERROR)
+            .json(
+              {
+                success: false,
+                error: {
+                  message: error.message
+                }
+              }
+            )
+        }
       }
     } catch (error) {
       console.log(error)
@@ -252,7 +284,106 @@ class BookController extends BaseController {
           {
             success: false,
             error: {
-              message: 'Internal server error'
+              message: error.message
+            }
+          }
+        )
+    }
+  }
+
+  async requestToDelete(req, res) {
+    // Validate the request
+    const { error } = ByIdRequest().validate(req.params)
+
+    if (error || !req.query.author_id) {
+      return res.status(httpStatus.BAD_REQUEST)
+        .json({
+          success: false,
+          error: {
+            message: error.details[0].message,
+            type: error.details[0].type,
+            context: error.details[0].context
+          }
+        })
+    }
+
+    const id = req.params.id
+    const author_id = req.query.author_id
+    console.log(id, author_id)
+
+    // We check if the book exists then if it not approved yet
+    try {
+      var book = await bookModel.readById(id)
+
+      if (!book[0]) {
+        return res.status(httpStatus.NOT_FOUND)
+          .json(
+            {
+              success: false,
+              message: 'Book not found'
+            }
+          )
+      }
+
+      // We check if the author is the owner of the book
+      if (book[0].author_id.toString() !== author_id) {
+        return res.status(httpStatus.FORBIDDEN)
+          .json(
+            {
+              success: false,
+              message: 'You are not allowed to delete this book'
+            }
+          )
+      }
+
+    } catch (error) {
+      console.log(error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json({
+          success: false,
+          error: {
+            message: error.message
+          }
+        })
+    }
+
+    const connection = await bookModel.getConnection()
+
+    try {
+      await connection.beginTransaction()
+
+      try {
+        await authorRequestModel.create({
+          book_id: id,
+          author_id: author_id,
+          request_type: 'delete',
+          status: 'pending',
+        })
+
+        await bookModel.update(id, { author_request_status: 'pending' })
+
+        await connection.commit()
+        return res.status(httpStatus.OK)
+          .json(
+            {
+              success: true,
+              message: 'Book delete request sent successfully'
+            }
+          )
+      } catch (error) {
+        await connection.rollback()
+        throw error
+      } finally {
+        connection.release()
+      }
+    } catch (error) {
+      console.log(error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          {
+            success: false,
+            error: {
+              message: error.message
             }
           }
         )

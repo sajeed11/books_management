@@ -25,6 +25,6 @@ router.get('/books', authMiddleware, bookController.readAll)
 router.get('/books/:id', authMiddleware, bookController.readById)
 router.post('/books', authMiddleware, bookController.createBook)
 router.put('/books/:id', authMiddleware, bookController.updateBook)
-// router.delete('/books/:id', authMiddleware, bookController.deleteBook)
+router.delete('/books/:id', authMiddleware, bookController.requestToDelete)
 
 export default router;
