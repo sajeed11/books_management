@@ -18,14 +18,12 @@ class BaseModel {
       await connection.beginTransaction();
 
       try {
-        await connection.query('INSERT INTO ?? SET ?', [this.tableName, data]);
-        // console.log(result)
-
-        // const newId = result[0].insertId
-        // console.log(newId)
+        const result = await connection.query('INSERT INTO ?? SET ?', [this.tableName, data]);
+        const newId = result[0].insertId
+        console.log(newId)
 
         await connection.commit();
-        return true
+        return newId
       } catch (error) {
         await connection.rollback();
         throw error;

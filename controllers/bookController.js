@@ -4,6 +4,9 @@ import BookModel from '../models/Book.js'
 import BaseController from './baseController.js'
 import { createBookRequestSchema, approveBookRequestSchema, updateBookRequestSchema } from '../requests/requestBook.js'
 import { ByIdRequest } from "../requests/requestBase.js";
+import AuthorRequestModel from "../models/AuthorRequest.js";
+
+const authorRequestModel = new AuthorRequestModel('author_requests')
 
 class BookController extends BaseController {
 
@@ -38,29 +41,64 @@ class BookController extends BaseController {
 
     try {
       var result = await bookModel.create(data)
-      // console.log(result)
+      console.log(result)
 
       if (result) {
-        res.status(httpStatus.CREATED)
+        try {
+
+          await authorRequestModel.create(
+            {
+              book_id: result,
+              author_id: req.body.author_id,
+              request_type: 'create',
+              status: 'pending',
+            }
+          )
+
+          return res.status(httpStatus.CREATED)
+            .json(
+              {
+                success: true,
+                message: 'Book created successfully, waiting for approval',
+                data: data
+              }
+            )
+        } catch (error) {
+          // console.log(error)
+          return res.status(httpStatus.INTERNAL_SERVER_ERROR)
+            .json(
+              {
+                success: false,
+                error: {
+                  message: 'Internal server error'
+                }
+              }
+            )
+        }
+      }
+    } catch (error) {
+      // console.log(error)
+      if (error.code === 'ER_DUP_ENTRY') {
+        return res.status(httpStatus.BAD_REQUEST)
           .json(
             {
-              success: true,
-              message: 'Book created successfully',
-              data: data
+              success: false,
+              error: {
+                message: 'Book already exists'
+              }
+            }
+          )
+      } else {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR)
+          .json(
+            {
+              success: false,
+              error: {
+                message: 'Internal server error'
+              }
             }
           )
       }
-    } catch (error) {
-      console.log(error)
-      res.status(httpStatus.INTERNAL_SERVER_ERROR)
-        .json(
-          {
-            success: false,
-            error: {
-              message: 'Internal server error'
-            }
-          }
-        )
     }
   }
 
