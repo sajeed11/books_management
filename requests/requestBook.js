@@ -18,4 +18,16 @@ function approveBookRequestSchema() {
   })
 }
 
-export { createBookRequestSchema, approveBookRequestSchema }
+function updateBookRequestSchema() {
+  return Joi.object({
+    title: Joi.string(),
+    author_id: Joi.number().required(),
+    isbn: Joi.string().required(),
+    publication_date: Joi.date(),
+    genre_id: Joi.number(),
+    price: Joi.number(),
+    stock_quantity: Joi.number(),
+  })
+}
+
+export { createBookRequestSchema, approveBookRequestSchema, updateBookRequestSchema }

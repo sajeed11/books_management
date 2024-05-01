@@ -2,7 +2,8 @@ import httpStatus from "http-status"; // For standardized HTTP status codes
 import autoBind from 'auto-bind'
 import BookModel from '../models/Book.js'
 import BaseController from './baseController.js'
-import { createBookRequestSchema, approveBookRequestSchema } from '../requests/requestBook.js'
+import { createBookRequestSchema, approveBookRequestSchema, updateBookRequestSchema } from '../requests/requestBook.js'
+import { ByIdRequest } from "../requests/requestBase.js";
 
 class BookController extends BaseController {
 
@@ -141,6 +142,85 @@ class BookController extends BaseController {
         )
     }
   }
+
+  async updateBook(req, res) {
+    // Validate the request
+    const { error } = updateBookRequestSchema().validate(req.body)
+    const { error: idError } = ByIdRequest().validate(req.params)
+
+    if (error || idError) {
+      return res.status(httpStatus.BAD_REQUEST)
+        .json(
+          {
+            success: false,
+            error: {
+              message: error ? error.details[0].message : idError.details[0].message,
+              type: error ? error.details[0].type : idError.details[0].type,
+              context: error ? error.details[0].context : idError.details[0].context
+            }
+          }
+        )
+    }
+
+    const id = req.params.id
+    const data = req.body
+
+    // We check if the book exists then if it not approved yet
+    try {
+      var book = await bookModel.readById(req.params.id)
+
+      if (!book[0]) {
+        return res.status(httpStatus.NOT_FOUND)
+          .json(
+            {
+              success: false,
+              error: {
+                message: 'Book not found'
+              }
+            }
+          )
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json({
+          success: false,
+          error: {
+            message: error.message
+          }
+        })
+    }
+
+    // We set the author_request_status to pending automatically
+    data.author_request_status = 'pending'
+
+    try {
+      var result = await bookModel.update(id, data)
+      console.log(result)
+
+      if (result) {
+        res.status(httpStatus.OK)
+          .json(
+            {
+              success: true,
+              message: 'Book updated successfully'
+            }
+          )
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          {
+            success: false,
+            error: {
+              message: 'Internal server error'
+            }
+          }
+        )
+    }
+  }
+
 }
 
 const bookModel = new BookModel('books')

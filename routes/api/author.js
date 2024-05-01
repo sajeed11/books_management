@@ -17,8 +17,14 @@ router.post('/register', authController.register);
 router.post('/login', beforeAuthMiddleware, authController.login);
 router.get('/logout', authController.logout)
 
+// Author with books
+// Here we assume the author can show all the books like the admin does
+// We can let the author see only the ready books by editing the readAll method in bookController.js
 router.get('/books', authMiddleware, bookController.readAll)
+// Same as above
 router.get('/books/:id', authMiddleware, bookController.readById)
-router.post('/books', authMiddleware, bookController.create)
+router.post('/books', authMiddleware, bookController.createBook)
+router.put('/books/:id', authMiddleware, bookController.updateBook)
+// router.delete('/books/:id', authMiddleware, bookController.deleteBook)
 
 export default router;
