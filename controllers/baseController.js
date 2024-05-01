@@ -127,18 +127,33 @@ class BaseController {
     const { error } = ByIdRequest().validate(req.params)
 
     if (error) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          message: error.details[0].message,
-          type: error.details[0].type,
-          context: error.details[0].context
-        }
-      })
+      return res.status(httpStatus.BAD_REQUEST)
+        .json({
+          success: false,
+          error: {
+            message: error.details[0].message,
+            type: error.details[0].type,
+            context: error.details[0].context
+          }
+        })
     }
 
+    const id = req.params.id;
+
+    // Check if the data exists
+    const data = await this.model.readById(id);
+    if (!data.length) {
+      return res.status(httpStatus.NOT_FOUND)
+        .json(
+          {
+            success: false,
+            message: 'Data not found'
+          }
+        );
+    }
+
+
     try {
-      const id = req.params.id;
       await this.model.delete(id);
       return res.status(httpStatus.OK)
         .json(
