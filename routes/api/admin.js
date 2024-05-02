@@ -6,6 +6,7 @@ import userController from '../../controllers/userController.js';
 import bookController from '../../controllers/bookController.js';
 import authorController from '../../controllers/authorController.js';
 import genreController from '../../controllers/genreController.js';
+import authorRequestController from '../../controllers/authorRequestController.js';
 
 // Middlewares
 import authMiddleware from '../../middlewares/authMiddleware.js';
@@ -37,6 +38,12 @@ router.delete('/books/:id', bookController.delete) //authMiddleware, adminMiddle
 router.get('/authors', authorController.readAll) // authMiddleware, adminMiddleware, 
 router.get('/authors/:id', authorController.readById) //authMiddleware, adminMiddleware,
 router.delete('/author/:id', authorController.delete) //authMiddleware, adminMiddleware, 
+
+// Admin with Authors Requests
+router.get('/author-requests', authorRequestController.readAll) // authMiddleware, adminMiddleware,
+router.get('/author-requests/:id', authorRequestController.readById) // authMiddleware, adminMiddleware,
+router.post('/author-requests/:id', authorRequestController.apprveAuthorRequest) // authMiddleware, adminMiddleware,
+router.delete('/author-requests/:id', authorRequestController.delete) // authMiddleware, adminMiddleware,
 
 // Admin with Genres
 router.get('/genres', genreController.readAll) // authMiddleware, adminMiddleware,

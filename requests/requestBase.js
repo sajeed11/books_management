@@ -6,4 +6,11 @@ function ByIdRequest() {
   })
 }
 
-export { ByIdRequest }
+function ByTwoIdRequest() {
+  return Joi.object({
+    id: Joi.number().required(),
+    author_id: Joi.number().required()
+  })
+}
+
+export { ByIdRequest, ByTwoIdRequest }

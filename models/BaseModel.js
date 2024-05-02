@@ -73,7 +73,9 @@ class BaseModel {
       }
 
       const result = await connection.query(query, params)
-      return result[0] || null; // Return first row or null if not found
+      if (result[0].length === 0) {
+        return null
+      } else return result[0]
     } catch (error) {
       console.error('Error reading data by ID:', error)
       throw error // Re-throw for handling in the controller

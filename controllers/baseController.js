@@ -21,7 +21,7 @@ class BaseController {
         )
     } catch (error) {
       console.error('Error creating data:', error);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error creating data' });
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   }
 
@@ -53,7 +53,7 @@ class BaseController {
         );
     } catch (error) {
       console.error('Error reading data:', error);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error reading data' });
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   }
 
@@ -100,7 +100,7 @@ class BaseController {
         );
     } catch (error) {
       console.error('Error reading data by ID:', error);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error reading data' });
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   }
 
@@ -118,7 +118,7 @@ class BaseController {
         );
     } catch (error) {
       console.error('Error updating data:', error);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error updating data' });
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   }
 
@@ -168,7 +168,7 @@ class BaseController {
         .json(
           {
             success: false,
-            message: 'Error deleting data'
+            message: error.message
           }
         );
     }
