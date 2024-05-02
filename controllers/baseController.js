@@ -1,6 +1,7 @@
 import httpStatus from "http-status"; // For standardized HTTP status codes
 import autoBind from 'auto-bind';
 import { ByIdRequest } from '../requests/requestBase.js';
+import { searchBookRequestSchema } from "../requests/requestBook.js";
 
 class BaseController {
   constructor(model) {
@@ -138,7 +139,7 @@ class BaseController {
         })
     }
 
-    const id = req.params.id;
+    const id = req.params.id
 
     // Check if the data exists
     const data = await this.model.readById(id);
@@ -171,6 +172,52 @@ class BaseController {
             message: error.message
           }
         );
+    }
+  }
+
+  async search(req, res) {
+    const seachTerms = req.body
+
+    // Validate the request depending on the model
+    if (req.baseUrl.includes('/books')) {
+      const { error } = searchBookRequestSchema().validate(seachTerms)
+      if (error) {
+        return res.status(httpStatus.BAD_REQUEST)
+          .json({
+            success: false,
+            error: {
+              message: error.details[0].message,
+              type: error.details[0].type,
+              context: error.details[0].context
+            }
+          })
+      }
+    }
+
+    try {
+      const data = await this.model.search(seachTerms);
+
+      if (data) {
+        return res.status(httpStatus.OK)
+          .json(
+            {
+              success: true,
+              message: 'Data retrieved successfully',
+              data: data
+            }
+          )
+      } else {
+        return res.status(httpStatus.NOT_FOUND)
+          .json(
+            {
+              success: false,
+              message: 'No data found'
+            }
+          )
+      }
+    } catch (error) {
+      console.error('Error searching data:', error);
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   }
 }

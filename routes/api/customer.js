@@ -22,10 +22,12 @@ router.get('/logout', authController.logout);
 // Customer with Books
 router.get('/books', authMiddleware, bookController.readAll)
 router.get('/books/:id', authMiddleware, bookController.readById)
+router.post('/books/search', authMiddleware, bookController.search)
 
 // Customer with Authors
 router.get('/authors', authMiddleware, authorController.readAll)
 router.get('/authors/:id', authMiddleware, authorController.readById)
+router.post('/authors/search', authMiddleware, authorController.search)
 
 // Customer with Genres
 router.get('/genres', authMiddleware, genreController.readAll)

@@ -389,7 +389,6 @@ class BookController extends BaseController {
         )
     }
   }
-
 }
 
 const bookModel = new BookModel('books')

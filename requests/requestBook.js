@@ -30,4 +30,15 @@ function updateBookRequestSchema() {
   })
 }
 
-export { createBookRequestSchema, approveBookRequestSchema, updateBookRequestSchema }
+function searchBookRequestSchema() {
+  return Joi.object({
+    title: Joi.string(),
+    author_name: Joi.number(),
+    isbn: Joi.string(),
+    publication_date: Joi.date(),
+    genre_name: Joi.number(),
+    price: Joi.number(),
+  })
+}
+
+export { createBookRequestSchema, approveBookRequestSchema, updateBookRequestSchema, searchBookRequestSchema }
