@@ -3,6 +3,7 @@ import express from 'express';
 // Controllers
 import bookController from '../../controllers/bookController.js';
 import authController from '../../controllers/authController.js';
+import authorRequestController from '../../controllers/authorRequestController.js';
 
 // Middlewares
 import authMiddleware from '../../middlewares/authMiddleware.js';
@@ -27,5 +28,8 @@ router.get('/books/:id', authMiddleware, bookController.readById)
 router.post('/books', authMiddleware, uploadFile.single('picture'), bookController.createBook)
 router.put('/books/:id', authMiddleware, bookController.updateBook)
 router.delete('/books/:id', authMiddleware, bookController.requestToDelete)
+
+// Author with his request
+router.get('/author_requests/:id', authMiddleware, authorRequestController.read)
 
 export default router;

@@ -9,6 +9,23 @@ class AuthorRequestModel extends BaseModel {
     autoBind(this)
   }
 
+  async read(id) {
+    const connection = await this.getConnection()
+
+    try {
+      const result = await connection.query('SELECT * from author_requests WHERE author_id = ?', [id])
+
+      if (result[0].length === 0) {
+        return null
+      } else return result[0]
+    } catch (error) {
+      console.error('Error in fetching data:', error)
+      throw error // Re-throw for handling in the controller
+    } finally {
+      connection.release()
+    }
+  }
+
   async approveAuthorRequest(id, data) {
     const connection = await this.getConnection()
 
@@ -17,7 +34,7 @@ class AuthorRequestModel extends BaseModel {
 
       try {
         await connection.query('UPDATE author_requests SET status = "approved" WHERE id = ?', [data.status, id])
-        await connection.query('UPDATE books SET author_request_status = "approved" WHERE id = ?', [data.book_id])
+        await connection.query('UPDATE books SET author_request_status = "none" WHERE id = ?', [data.book_id])
 
         await connection.commit()
         return { id, ...data }
