@@ -9,6 +9,8 @@ function createBookRequestSchema() {
     genre_id: Joi.number().required(),
     price: Joi.number().required(),
     stock_quantity: Joi.number().required(),
+    author_request_status: Joi.string().required(),
+    picture: Joi.string().required()
   })
 }
 

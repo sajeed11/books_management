@@ -7,6 +7,7 @@ import authController from '../../controllers/authController.js';
 // Middlewares
 import authMiddleware from '../../middlewares/authMiddleware.js';
 import beforeAuthMiddleware from '../../middlewares/beforeAuth.js';
+import { uploadFile } from '../../middlewares/uploadFiles.js';
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ router.get('/logout', authController.logout)
 router.get('/books', authMiddleware, bookController.readAll)
 // Same as above
 router.get('/books/:id', authMiddleware, bookController.readById)
-router.post('/books', authMiddleware, bookController.createBook)
+router.post('/books', authMiddleware, uploadFile.single('picture'), bookController.createBook)
 router.put('/books/:id', authMiddleware, bookController.updateBook)
 router.delete('/books/:id', authMiddleware, bookController.requestToDelete)
 

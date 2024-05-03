@@ -20,7 +20,6 @@ class BaseModel {
       try {
         const result = await connection.query('INSERT INTO ?? SET ?', [this.tableName, data]);
         const newId = result[0].insertId
-        console.log(newId)
 
         await connection.commit()
         return newId

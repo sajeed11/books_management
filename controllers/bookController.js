@@ -17,8 +17,21 @@ class BookController extends BaseController {
 
   // Create a new book
   async createBook(req, res) {
+
+    const data = {
+      title: req.body.title,
+      author_id: req.body.author_id,
+      isbn: req.body.isbn,
+      author_request_status: 'pending',
+      picture: req.file ? req.file.filename : null,
+      stock_quantity: req.body.stock_quantity,
+      price: req.body.price,
+      genre_id: req.body.genre_id,
+      publication_date: req.body.publication_date,
+    }
+
     // Validate the request body
-    const { error } = createBookRequestSchema().validate(req.body)
+    const { error } = createBookRequestSchema().validate(data)
 
     if (error) {
       return res.status(httpStatus.BAD_REQUEST)
@@ -34,14 +47,8 @@ class BookController extends BaseController {
         )
     }
 
-    const data = req.body
-
-    // We set the author_request_status to pending automatically
-    data.author_request_status = 'pending'
-
     try {
       var result = await bookModel.create(data)
-      console.log(result)
 
       if (result) {
         try {

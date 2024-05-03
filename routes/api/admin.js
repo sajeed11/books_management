@@ -48,5 +48,6 @@ router.delete('/author-requests/:id', authorRequestController.delete) // authMid
 // Admin with Genres
 router.get('/genres', genreController.readAll) // authMiddleware, adminMiddleware,
 router.get('/genres/:id', genreController.readById) // authMiddleware, adminMiddleware,
+router.post('/genres', genreController.create) // authMiddleware, adminMiddleware,
 
 export default router;
