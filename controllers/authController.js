@@ -6,6 +6,9 @@ import dotenv from "dotenv";
 import { registerRequestSchema, loginRequestSchema } from "../requests/authRequest.js";
 import httpStatus from "http-status";
 
+// Create an instance of the UserModel
+const userModel = new UserModel('users');
+
 dotenv.config();
 
 const maxAge = 3 * 24 * 60 * 60;
@@ -57,7 +60,7 @@ class AuthController {
     };
 
     try {
-      await UserModel.registerUser(userData, authorData)
+      await userModel.registerUser(userData, authorData)
 
       return res.status(httpStatus.OK)
         .json({
@@ -130,7 +133,7 @@ class AuthController {
     }
 
     try {
-      const result = await UserModel.loginUser(data)
+      const result = await userModel.loginUser(data)
 
       const token = createToken(result[0].id, process.env.JWT_SECRET)
       res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
