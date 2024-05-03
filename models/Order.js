@@ -1,5 +1,5 @@
 import autoBind from 'auto-bind'
-import BaseModel from "./BaseModel";
+import BaseModel from "./BaseModel.js";
 
 
 class OrderModel extends BaseModel {

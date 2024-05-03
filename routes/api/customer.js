@@ -5,6 +5,7 @@ import authController from '../../controllers/authController.js';
 import bookController from '../../controllers/bookController.js';
 import authorController from '../../controllers/authorController.js';
 import genreController from '../../controllers/genreController.js';
+import orderController from '../../controllers/orderController.js';
 
 // Middlewares
 import authMiddleware from '../../middlewares/authMiddleware.js';
@@ -33,4 +34,9 @@ router.post('/authors/search', authMiddleware, authorController.search)
 router.get('/genres', authMiddleware, genreController.readAll)
 router.get('/genres/:id', authMiddleware, genreController.readById)
 
+// Customer with Orders
+router.post('/orders', authMiddleware, orderController.order)
+
 export default router;
+
+

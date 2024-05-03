@@ -1,6 +1,7 @@
 import Joi from 'joi';
 
 
+// Base Request Schema
 export function ByIdRequest() {
   return Joi.object({
     id: Joi.number().required()
@@ -14,6 +15,7 @@ export function ByTwoIdRequest() {
   })
 }
 
+// Book Request Schema
 export function createBookRequestSchema() {
   return Joi.object({
     title: Joi.string().required(),
@@ -57,6 +59,7 @@ export function searchBookRequestSchema() {
   })
 }
 
+// Author Request Schema
 export function ApprovingRequestID() {
   return Joi.object({
     id: Joi.number().required()
@@ -68,5 +71,15 @@ export function ApprovingRequestData() {
     id: Joi.number().required(),
     book_id: Joi.number().required(),
     status: Joi.string().valid('approved', 'rejected').required()
+  })
+}
+
+// Orders Request Schema
+export function createOrderRequestSchema() {
+  return Joi.object({
+    book_id: Joi.number().required(),
+    customer_id: Joi.number().required(),
+    order_date: Joi.date().required(),
+    status: Joi.string().required()
   })
 }
