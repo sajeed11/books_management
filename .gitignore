@@ -26,3 +26,7 @@ coverage
 *.sw?
 
 /.env
+
+# Xata files not to be committed
+/.xata/*
+/.xatarc
