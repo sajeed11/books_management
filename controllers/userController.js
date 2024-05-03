@@ -1,7 +1,6 @@
 // Purpose: User controller to handle user related operations
 import autoBind from 'auto-bind'
 import UserModel from "../models/User.js";
-import UserRequest from "../requests/requestUser.js";
 import BaseController from '../controllers/baseController.js'
 class UserController extends BaseController {
 

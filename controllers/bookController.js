@@ -2,8 +2,8 @@ import httpStatus from "http-status"; // For standardized HTTP status codes
 import autoBind from 'auto-bind'
 import BookModel from '../models/Book.js'
 import BaseController from './baseController.js'
-import { createBookRequestSchema, approveBookRequestSchema, updateBookRequestSchema } from '../requests/requestBook.js'
-import { ByIdRequest, ByTwoIdRequest } from "../requests/requestBase.js";
+import { createBookRequestSchema, approveBookRequestSchema, updateBookRequestSchema } from '../requests/requests.js'
+import { ByIdRequest, ByTwoIdRequest } from "../requests/requests.js";
 import AuthorRequestModel from "../models/AuthorRequest.js";
 
 const authorRequestModel = new AuthorRequestModel('author_requests')

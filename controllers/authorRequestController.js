@@ -2,7 +2,7 @@ import autoBind from "auto-bind";
 import httpStatus from "http-status";
 import BaseController from "./baseController.js";
 import AuthorRequestModel from "../models/AuthorRequest.js";
-import { ApprovingRequestID, ApprovingRequestData } from "../requests/requestAuthorRequest.js";
+import { ApprovingRequestID, ApprovingRequestData } from "../requests/requests.js";
 
 
 class AuthorRequestController extends BaseController {

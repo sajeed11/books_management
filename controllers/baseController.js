@@ -1,7 +1,7 @@
 import httpStatus from "http-status"; // For standardized HTTP status codes
 import autoBind from 'auto-bind';
-import { ByIdRequest } from '../requests/requestBase.js';
-import { searchBookRequestSchema } from "../requests/requestBook.js";
+import { ByIdRequest } from '../requests/requests.js';
+import { searchBookRequestSchema } from "../requests/requests.js";
 
 class BaseController {
   constructor(model) {
