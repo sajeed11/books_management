@@ -30,3 +30,6 @@ coverage
 # Xata files not to be committed
 /.xata/*
 /.xatarc
+
+# Uploads not to be committed
+/uploads/*
