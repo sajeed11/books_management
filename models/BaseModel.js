@@ -49,8 +49,10 @@ class BaseModel {
       }
 
       const result = await connection.query(query, params)
-      return result[0]
 
+      if (result[0].length === 0) {
+        return null
+      } else return result[0]
     } catch (error) {
       console.error('Error reading data:', error)
       throw error; // Re-throw for handling in the controller

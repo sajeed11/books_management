@@ -31,7 +31,7 @@ class BaseController {
     try {
       let data;
 
-      if (req.baseUrl.includes('api/user')) {
+      if (req.baseUrl.includes('api/customer/books')) {
         data = await this.model.readAll({ author_request_status: 'none' })
       } else data = await this.model.readAll();
 
