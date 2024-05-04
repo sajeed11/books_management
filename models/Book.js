@@ -8,6 +8,97 @@ class BookModel extends BaseModel {
     autoBind(this)
   }
 
+  async createBook(data) {
+    const connection = await this.getConnection()
+
+    try {
+      await connection.beginTransaction()
+
+      try {
+        const book = await connection.query('INSERT INTO books SET ?', data)
+        const bookId = book[0].insertId
+
+        const request_data = {
+          book_id: bookId,
+          author_id: data.author_id,
+          request_type: 'create',
+          status: 'pending'
+        }
+
+        await connection.query('INSERT INTO author_requests SET ?', request_data)
+
+        await connection.commit()
+
+        const res_data = {
+          id: bookId,
+          ...data,
+          author_request_status: 'pending'
+        }
+
+        return res_data
+      } catch (error) {
+        await connection.rollback()
+        throw error
+      } finally {
+        connection.release()
+      }
+    } catch (error) {
+      console.log('Error creating book:', error)
+      throw error
+    }
+  }
+
+  async updateBook(id, data) {
+    const connection = await this.getConnection()
+
+    try {
+      await connection.beginTransaction()
+
+      try {
+        let query = 'UPDATE books SET'
+        let params = []
+        let set = []
+
+        for (const key in data) {
+          set.push(`${key} = ?`)
+          params.push(data[key])
+        }
+
+        query += ` ${set.join(', ')} WHERE id = ?`
+
+        params.push(id)
+
+        await connection.query(query, params)
+
+        const request_data = {
+          book_id: id,
+          author_id: data.author_id,
+          request_type: 'update',
+          status: 'pending'
+        }
+
+        await connection.query('INSERT INTO author_requests SET ?', request_data)
+
+        await connection.commit()
+
+        const res_data = {
+          id: id,
+          ...data,
+          author_request_status: 'pending'
+        }
+
+        return res_data
+      } catch (error) {
+        await connection.rollback()
+        throw error
+      } finally {
+        connection.release()
+      }
+    } catch (error) {
+      console.log('Error updating book:', error)
+      throw error
+    }
+  }
 
   async approveBook(id) {
     const connection = await this.getConnection()
@@ -21,6 +112,44 @@ class BookModel extends BaseModel {
       throw error
     } finally {
       connection.release()
+    }
+  }
+
+  async deleteBook(id, author_id) {
+    const connection = await this.getConnection()
+
+    try {
+      await connection.beginTransaction()
+
+      try {
+        await connection.query('UPDATE books SET author_request_status = "pending" WHERE id = ?', id)
+
+        const request_data = {
+          book_id: id,
+          author_id: author_id,
+          request_type: 'delete',
+          status: 'pending'
+        }
+
+        await connection.query('INSERT INTO author_requests SET ?', request_data)
+
+        await connection.commit()
+
+        const res_data = {
+          id: id,
+          author_request_status: 'pending'
+        }
+
+        return res_data
+      } catch (error) {
+        await connection.rollback()
+        throw error
+      } finally {
+        connection.release()
+      }
+    } catch (error) {
+      console.log('Error deleting book:', error)
+      throw error
     }
   }
 
