@@ -3,6 +3,8 @@ import httpStatus from "http-status";
 import BaseController from "./baseController.js";
 import AuthorRequestModel from "../models/AuthorRequest.js";
 import { ApprovingRequestID, ApprovingRequestData, ByIdRequest } from "../requests/requests.js";
+import { clientErrorResponse, notFoundResponse, serverErrorResponse } from "../helpers/handleErrorResponse.js";
+import { okResponse } from "../helpers/handleOkResponse.js";
 
 class AuthorRequestController extends BaseController {
 
@@ -15,40 +17,19 @@ class AuthorRequestController extends BaseController {
     // Validate the request
     const { error } = ByIdRequest().validate(req.params)
 
-    if (error) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json({
-          success: false,
-          error: {
-            message: error.details[0].message,
-            type: error.details[0].type,
-            context: error.details[0].context
-          }
-        });
-    }
+    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     const id = req.params.id
 
     try {
       const result = await authorRequestModel.read(id)
 
-      if (result.length === 0) {
-        return res.status(httpStatus.NOT_FOUND)
-          .json({
-            success: false,
-            message: 'No author request found'
-          })
-      }
+      if (result.length === 0) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
 
-      return res.status(httpStatus.OK)
-        .json({
-          success: true,
-          message: 'Your requests fetched with success',
-          data: result
-        })
+      return res.status(httpStatus.OK).json(okResponse(result))
     } catch (error) {
-      console.error('Error fetching your requests', error);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
+      console.error('Error fetching your requests', error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
 
@@ -57,49 +38,27 @@ class AuthorRequestController extends BaseController {
     const testedData = { ...req.body, ...req.params }
     const { error } = ApprovingRequestData().validate(testedData)
 
-    if (error) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json({
-          success: false,
-          error: {
-            message: error.details[0].message,
-            type: error.details[0].type,
-            context: error.details[0].context
-          }
-        });
-    }
+    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     const id = req.params.id
     const data = req.body
 
     try {
       const authorRequest = await this.model.readById(id)
-      console.log(authorRequest)
-      if (!authorRequest) {
-        return res.status(httpStatus.NOT_FOUND)
-          .json({
-            success: false,
-            message: 'Author request not found'
-          })
-      }
+
+      if (!authorRequest) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
     } catch (error) {
-      console.error('Error approving author request:', error);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
+      // console.error('Error approving author request:', error);
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
 
     try {
       const result = await this.model.approveAuthorRequest(id, data)
-      return res.status(httpStatus.OK)
-        .json(
-          {
-            success: true,
-            message: 'Author request approved',
-            data: result
-          }
-        )
+
+      return res.status(httpStatus.OK).json(okResponse(result))
     } catch (error) {
-      console.error('Error approving author request:', error);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: error.message });
+      // console.error('Error approving author request:', error);
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
 }
