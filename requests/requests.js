@@ -45,6 +45,7 @@ export function updateBookRequestSchema() {
     genre_id: Joi.number(),
     price: Joi.number(),
     stock_quantity: Joi.number(),
+    author_request_status: Joi.string(),
   })
 }
 
