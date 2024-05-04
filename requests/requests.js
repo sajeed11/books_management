@@ -75,11 +75,23 @@ export function ApprovingRequestData() {
 }
 
 // Orders Request Schema
-export function createOrderRequestSchema() {
+export function CreateOrderRequestSchema() {
   return Joi.object({
     book_id: Joi.number().required(),
     customer_id: Joi.number().required(),
-    order_date: Joi.date().required(),
-    status: Joi.string().required()
+  })
+}
+
+// Customer Request Schema
+export function ByCustomerIdRequest() {
+  return Joi.object({
+    customer_id: Joi.number().required()
+  })
+}
+
+export function ByIdAndCustomerIdRequest() {
+  return Joi.object({
+    id: Joi.number().required(),
+    customer_id: Joi.number().required()
   })
 }
