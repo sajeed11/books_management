@@ -1,21 +1,38 @@
 // Here we define helpers funcitons to handle errors response
 
-export function errorResponse(error) {
-  let message = 'Internal Server Error';
+export function clientErrorResponse(error) {
+  let errorObj = {};
 
   // Extract error message from various error types
   if (error instanceof Error) {
-    message = error.message;
+    errorObj = {
+      message: error.message,
+      code: error.code
+    }
   } else if (typeof error === 'object' && error.details) {
-    message = error.details[0].message;
+    errorObj = {
+      message: error.details[0].message,
+      type: error.details[0].type,
+      context: error.details[0].context
+    }
   } else if (typeof error === 'string') {
-    message = error;
+    errorObj = {
+      message: error
+    }
   }
 
   return {
     success: false,
+    error: errorObj
+  };
+}
+
+export function serverErrorResponse(error) {
+  return {
+    success: false,
     error: {
-      message: message
+      message: error.sqlMessage,
+      code: error.code
     }
   };
 }
