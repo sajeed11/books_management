@@ -4,7 +4,7 @@ import BaseController from "./baseController.js";
 import OrderModel from "../models/Order.js";
 import BookModel from "../models/Book.js";
 import { ByCustomerIdRequest, CreateOrderRequestSchema, ByIdAndCustomerIdRequest } from "../requests/requests.js";
-import { errorResponse, notFoundResponse } from "../helpers/handleErrorResponse.js";
+import { clientErrorResponse, notFoundResponse, serverErrorResponse } from "../helpers/handleErrorResponse.js";
 import { okResponse } from "../helpers/handleOkResponse.js";
 
 const bookModel = new BookModel('books')
@@ -15,28 +15,23 @@ class OrderController extends BaseController {
     autoBind(this)
   }
 
-
   // Read all orders
   async readOwnAll(req, res) {
     const customer_id = req.params.customer_id
     // Validate the request
     const { error } = ByCustomerIdRequest().validate({ customer_id })
 
-    if (error) {
-      res.status(httpStatus.BAD_REQUEST).json(errorResponse(error))
-    }
+    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     try {
       const data = await orderModel.readAll({ customer_id })
 
-      if (!data) {
-        res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
-      }
+      if (!data) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
 
-      res.status(httpStatus.OK).json(okResponse(data))
+      return res.status(httpStatus.OK).json(okResponse(data))
     } catch (error) {
       // console.log(error)
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(errorResponse(error))
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
 
@@ -47,25 +42,23 @@ class OrderController extends BaseController {
     // Validate the request
     const { error } = ByIdAndCustomerIdRequest().validate({ customer_id, id })
 
-    if (error) {
-      res.status(httpStatus.BAD_REQUEST).json(errorResponse(error))
-    }
+    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
+
 
     try {
       const data = await orderModel.readById(id)
 
       if (!data) {
-        res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
+        return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
       }
 
-      if (data[0].customer_id !== parseInt(customer_id)) {
-        return res.status(httpStatus.FORBIDDEN).json(errorResponse('You are not authorized to view this order'))
-      }
+      if (data[0].customer_id !== parseInt(customer_id))
+        res.status(httpStatus.FORBIDDEN).json(clientErrorResponse('You are not authorized to view this order'))
 
-      res.status(httpStatus.OK).json(okResponse(data))
+      return res.status(httpStatus.OK).json(okResponse(data))
     } catch (error) {
-      // console.log(error)
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).json(errorResponse(error))
+      console.log(error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
 
@@ -74,9 +67,7 @@ class OrderController extends BaseController {
     // Validathe the request
     const { error } = CreateOrderRequestSchema().validate(req.body)
 
-    if (error) {
-      res.status(httpStatus.BAD_REQUEST).json(errorResponse(error))
-    }
+    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     const data = {
       book_id: req.body.book_id,
@@ -90,9 +81,7 @@ class OrderController extends BaseController {
     try {
       const book = await bookModel.readById(data.book_id)
 
-      if (!book) {
-        res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
-      }
+      if (!book) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
 
       try {
         await connection.beginTransaction()
@@ -103,20 +92,20 @@ class OrderController extends BaseController {
           await bookModel.update(data.book_id, { stock_quantity: book[0].stock_quantity - 1 })
 
           await connection.commit()
-          res.status(httpStatus.CREATED).json(okResponse(result))
+          return res.status(httpStatus.CREATED).json(okResponse(result))
         } catch (error) {
           await connection.rollback()
-          res.status(httpStatus.INTERNAL_SERVER_ERROR).json(errorResponse(error))
+          return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
         } finally {
           connection.release()
         }
       } catch (error) {
-        console.log(error)
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(errorResponse(error))
+        // console.log(error)
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
       }
     } catch (error) {
-      console.log(error)
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(errorResponse(error))
+      // console.log(error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
 }

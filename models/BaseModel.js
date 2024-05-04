@@ -15,20 +15,10 @@ class BaseModel {
     const connection = await this.getConnection()
 
     try {
-      await connection.beginTransaction()
+      const result = await connection.query('INSERT INTO ?? SET ?', [this.tableName, data]);
+      const newId = result[0].id
 
-      try {
-        const result = await connection.query('INSERT INTO ?? SET ?', [this.tableName, data]);
-        const newId = result[0].insertId
-
-        await connection.commit()
-        return newId
-      } catch (error) {
-        await connection.rollback()
-        throw error;
-      } finally {
-        connection.release()
-      }
+      return newId
     } catch (error) {
       console.error('Error creating data:', error)
       throw error // Re-throw for handling in the controller
@@ -92,9 +82,9 @@ class BaseModel {
       await connection.beginTransaction()
 
       try {
-        await connection.query('UPDATE ?? SET ? WHERE id = ?', [this.tableName, data, id]);
+        const result = await connection.query('UPDATE ?? SET ? WHERE id = ?', [this.tableName, data, id]);
         await connection.commit()
-        return true;
+        return result[0]
       } catch (error) {
         await connection.rollback()
         throw error

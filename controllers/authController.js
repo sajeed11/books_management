@@ -1,10 +1,11 @@
-import UserModel from "../models/User.js";
-import AuthorModel from "../models/Author.js";
+import httpStatus from "http-status";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
+import UserModel from "../models/User.js";
 import { registerRequestSchema, loginRequestSchema } from "../requests/authRequest.js";
-import httpStatus from "http-status";
+import { clientErrorResponse, serverErrorResponse } from "../helpers/handleErrorResponse.js";
+import { okResponse } from "../helpers/handleOkResponse.js";
 
 // Create an instance of the UserModel
 const userModel = new UserModel('users');
@@ -23,22 +24,12 @@ class AuthController {
   // Register user
   static async register(req, res) {
     // Check if request method is POST
-    if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Please Register' })
+    if (req.method !== 'POST') return res.status(httpStatus.TEMPORARY_REDIRECT).json(clientErrorResponse('Please register'))
 
     // Validate request
     const { error } = registerRequestSchema().validate(req.body);
 
-    if (error) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json({
-          success: false,
-          error: {
-            message: error.details[0].message,
-            type: error.details[0].type,
-            context: error.details[0].context
-          }
-        });
-    }
+    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     const { username, email, password, role, name, biography } = req.body;
 
@@ -60,73 +51,24 @@ class AuthController {
     };
 
     try {
-      await userModel.registerUser(userData, authorData)
+      const data = await userModel.registerUser(userData, authorData)
 
-      return res.status(httpStatus.OK)
-        .json({
-          success: true,
-          message: "User Created with success",
-        })
-
+      return res.status(httpStatus.CREATED).json(okResponse(data))
     } catch (error) {
       // console.log(error)
-      if (error.code === 'ER_DUP_ENTRY') {
-        return res.status(httpStatus.BAD_REQUEST)
-          .json({
-            success: false,
-            error: {
-              message: error.sqlMessage,
-              code: error.code
-            }
-          });
-      } else if (error.code === 'ER_BAD_NULL_ERROR') {
-        return res.status(httpStatus.BAD_REQUEST)
-          .json({
-            success: false,
-            error: {
-              message: error.sqlMessage,
-              code: error.code
-            }
-          });
-      } else {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR)
-          .json({
-            success: false,
-            error: {
-              message: error.sqlMessage,
-              code: error.code
-            }
-          });
-      }
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
   // Login user
   static async login(req, res) {
-    if (req.method !== 'POST') {
-      return res.status(httpStatus.TEMPORARY_REDIRECT)
-        .json({
-          success: false,
-          message: 'Please Login'
-        })
-    }
+    if (req.method !== 'POST') res.status(httpStatus.TEMPORARY_REDIRECT).json(clientErrorResponse('Please login'))
 
     // Validate request 
     const { error } = loginRequestSchema().validate(req.body)
 
-    if (error) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json({
-          success: false,
-          error: {
-            message: error.details[0].message,
-            type: error.details[0].type,
-            context: error.details[0].context
-          }
-        });
-    }
+    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     const { email, password } = req.body;
-
     const data = {
       email,
       password
@@ -142,40 +84,25 @@ class AuthController {
       if (result[0].role === 'admin') {
         const adminToken = createToken(result[0].id, process.env.ADMIN_JWT_SECRET)
         res.cookie('admin_jwt', adminToken, { httpOnly: true, maxAge: maxAge * 1000 })
-        console.log('admin token created')
+        // console.log('admin token created')
       }
 
-      return res.status(httpStatus.OK)
-        .json({
-          success: true,
-          message: "Logged In with success",
-          data: {
-            username: result[0].username,
-            email: result[0].email
-          }
-        })
-
+      return res.status(httpStatus.OK).json(okResponse(result))
     } catch (error) {
-      console.log('Error on login:', error)
-      return res.status(httpStatus.BAD_REQUEST)
-        .json({
-          success: false,
-          message: error.message
-        })
+      // console.log('Error on login:', error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
 
   // Logout user
   static async logout(req, res) {
-    res.cookie('jwt', '', { maxAge: 1 })
-    res.cookie('admin_jwt', '', { maxAge: 1 })
-    res.status(httpStatus.OK)
-      .json(
-        {
-          success: true,
-          message: 'User logged out successfully'
-        }
-      )
+    try {
+      res.cookie('jwt', '', { maxAge: 1 })
+      res.cookie('admin_jwt', '', { maxAge: 1 })
+      return res.status(httpStatus.OK).json(okResponse('User logged out'))
+    } catch (error) {
+      return res.status(httpStatus.NOT_MODIFIED).json(clientErrorResponse(error))
+    }
   }
 }
 
