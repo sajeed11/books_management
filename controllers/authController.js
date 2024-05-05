@@ -61,7 +61,7 @@ class AuthController {
   }
   // Login user
   static async login(req, res) {
-    if (req.method !== 'POST') res.status(httpStatus.TEMPORARY_REDIRECT).json(clientErrorResponse('Please login'))
+    if (req.method !== 'POST') return res.status(httpStatus.TEMPORARY_REDIRECT).json(clientErrorResponse('Please login'))
 
     // Validate request 
     const { error } = loginRequestSchema().validate(req.body)
