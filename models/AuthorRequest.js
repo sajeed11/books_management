@@ -26,31 +26,63 @@ class AuthorRequestModel extends BaseModel {
     }
   }
 
-  async approveAuthorRequest(id, data) {
+  async interactAuthorRequest(id, data, requestType) {
     const connection = await this.getConnection()
 
     try {
       await connection.beginTransaction()
 
       try {
-        await connection.query('UPDATE author_requests SET status = "approved" WHERE id = ?', [data.status, id])
-        await connection.query('UPDATE books SET author_request_status = "none" WHERE id = ?', [data.book_id])
+        await connection.query('UPDATE author_requests SET status = ? WHERE id = ?', [data.status, id])
+
+        // Make action based on the status and the request type
+        if (data.status === 'approved') {
+          if (requestType === 'create' || requestType === 'update')
+            await connection.query('UPDATE books SET author_request_status = none WHERE id = ?', data.book_id)
+          else await connection.query('DELETE from books WHERE id = ?', data.book_id)
+        }
 
         await connection.commit()
         return { id, ...data }
       }
       catch (error) {
         await connection.rollback()
-        console.error('Error approving author request:', error);
+        // console.error('Error approving author request:', error);
         throw error
       } finally {
         connection.release()
       }
     } catch (error) {
-      console.error('Error approving author request:', error);
+      // console.error('Error approving author request:', error);
       throw error
     }
   }
+
+  // async interactWithAuthorDelete(id, data) {
+  //   const connection = await this.getConnection()
+
+  //   try {
+  //     await connection.beginTransaction()
+
+  //     try {
+  //       await connection.query('DELETE FROM author_requests WHERE id = ?', id)
+  //       await connection.query('DELETE FROM books WHERE id = ?', data.book_id)
+
+  //       await connection.commit()
+  //       return { id, ...data }
+  //     }
+  //     catch (error) {
+  //       await connection.rollback()
+  //       console.error('Error approving author request:', error);
+  //       throw error
+  //     } finally {
+  //       connection.release()
+  //     }
+  //   } catch (error) {
+  //     console.error('Error approving author request:', error);
+  //     throw error
+  //   }
+  // }
 }
 
 export default AuthorRequestModel
