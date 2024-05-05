@@ -8,7 +8,7 @@ class BookModel extends BaseModel {
     autoBind(this)
   }
 
-  async createBook(data) {
+  async createBook(data, role) {
     const connection = await this.getConnection()
 
     try {
@@ -18,14 +18,16 @@ class BookModel extends BaseModel {
         const book = await connection.query('INSERT INTO books SET ?', data)
         const bookId = book[0].insertId
 
-        const request_data = {
-          book_id: bookId,
-          author_id: data.author_id,
-          request_type: 'create',
-          status: 'pending'
-        }
+        if (role != 'admin') {
+          const request_data = {
+            book_id: bookId,
+            author_id: data.author_id,
+            request_type: 'create',
+            status: 'pending'
+          }
 
-        await connection.query('INSERT INTO author_requests SET ?', request_data)
+          await connection.query('INSERT INTO author_requests SET ?', request_data)
+        }
 
         await connection.commit()
 

@@ -38,8 +38,14 @@ class BookController extends BaseController {
     if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     try {
-      const result = await this.model.createBook(data)
-      console.log(result)
+      let result = {}
+      if (req.baseUrl.includes('/admin')) {
+        result = await this.model.createBook(data, 'admin')
+        // console.log(result)
+      } else {
+        result = await this.model.createBook(data)
+        // console.log(result)
+      }
 
       return res.status(httpStatus.CREATED).json(okResponse(result))
     } catch (error) {
@@ -49,34 +55,34 @@ class BookController extends BaseController {
   }
 
   // Approve a book
-  async approveBook(req, res) {
-    // Validate the request
-    const { error } = approveBookRequestSchema().validate(req.params)
+  // async approveBook(req, res) {
+  //   // Validate the request
+  //   const { error } = approveBookRequestSchema().validate(req.params)
 
-    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
+  //   if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
-    // We check if the book exists then if it not approved yet
-    try {
-      var book = await bookModel.readById(req.params.id)
+  //   // We check if the book exists then if it not approved yet
+  //   try {
+  //     var book = await bookModel.readById(req.params.id)
 
-      if (!book) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
+  //     if (!book) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
 
-      if (book.author_request_status === 'none')
-        return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse('Book already approved'))
-    } catch (error) {
-      // console.log(error)
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
-    }
+  //     if (book.author_request_status === 'none')
+  //       return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse('Book already approved'))
+  //   } catch (error) {
+  //     // console.log(error)
+  //     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
+  //   }
 
-    try {
-      var result = await bookModel.update(req.params.id, { author_request_status: 'none' })
+  //   try {
+  //     var result = await bookModel.update(req.params.id, { author_request_status: 'none' })
 
-      return res.status(httpStatus.OK).json(okResponse(result))
-    } catch (error) {
-      console.log(error)
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
-    }
-  }
+  //     return res.status(httpStatus.OK).json(okResponse(result))
+  //   } catch (error) {
+  //     console.log(error)
+  //     return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
+  //   }
+  // }
 
   async updateBook(req, res) {
     const id = req.params.id

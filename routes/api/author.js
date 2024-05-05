@@ -27,7 +27,7 @@ router.get('/books', authMiddleware, bookController.readAll)
 router.get('/books/:id', authMiddleware, bookController.readById)
 router.post('/books', authMiddleware, uploadFile.single('picture'), bookController.createBook)
 router.put('/books/:id', authMiddleware, bookController.updateBook)
-router.delete('/books/:id', authMiddleware, bookController.deleteBook)
+router.post('/books/:id', authMiddleware, bookController.deleteBook)
 
 // Author with his request
 router.get('/author_requests/:id', authMiddleware, authorRequestController.read)

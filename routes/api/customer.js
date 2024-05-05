@@ -21,9 +21,9 @@ router.post('/login', beforeAuthMiddleware, authController.login);
 router.get('/logout', authController.logout);
 
 // Customer with Books
-router.get('/books', authMiddleware, bookController.readAll)
-router.get('/books/:id', authMiddleware, bookController.readById)
-router.post('/books/search', authMiddleware, bookController.search)
+router.get('/books', bookController.readAll) // authMiddlewar, the user can see all the books
+router.get('/books/:id', bookController.readById) // authMiddleware, the user can see a single book
+router.post('/books/search', bookController.search)
 
 // Customer with Authors
 router.get('/authors', authMiddleware, authorController.readAll)
