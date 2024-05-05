@@ -37,9 +37,15 @@ class AuthorRequestModel extends BaseModel {
 
         // Make action based on the status and the request type
         if (data.status === 'approved') {
-          if (requestType === 'create' || requestType === 'update')
+          if (requestType === 'delete') {
+            await connection.query('DELETE from books WHERE id = ?', data.book_id)
+
+            // Archiving the deleted book
+            const [book] = await connection.query('SELECT * FROM books WHERE id = ?', data.book_id)
+            await connection.query('INSERT INTO archived_books SET title = ?, author_id = ?, isbn = ?, picture = ?, stock_quantity = ?, price = ?, genre_id = ?, publication_date = ?', [book.title, book.author_id, book.isbn, book.picture, book.stock_quantity, book.price, book.genre_id, book.publication_date])
+          } else {
             await connection.query('UPDATE books SET author_request_status = none WHERE id = ?', data.book_id)
-          else await connection.query('DELETE from books WHERE id = ?', data.book_id)
+          }
         }
 
         await connection.commit()
