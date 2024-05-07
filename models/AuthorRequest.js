@@ -46,9 +46,7 @@ class AuthorRequestModel extends BaseModel {
           } else {
             await connection.query('UPDATE books SET author_request_status = none WHERE id = ?', data.book_id)
           }
-        } else {
-          
-        }
+        } 
 
         await connection.commit()
         return { id, ...data }
