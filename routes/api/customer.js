@@ -38,7 +38,7 @@ router.get('/genres/:id', authMiddleware, genreController.readById)
 router.post('/orders', authMiddleware, orderController.order)
 router.get('/orders/:customer_id', authMiddleware, orderController.readOwnAll)
 router.get('/orders/:customer_id/:id', authMiddleware, orderController.readOwnById)
-
+router.delete('/orders/:customer_id/:id', authMiddleware, orderController.deleteOwnById)
 export default router;
 
 

@@ -108,6 +108,25 @@ class OrderController extends BaseController {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
+
+  // Delete an order
+  async deleteOwnById(req, res) {
+    const { customer_id, id } = req.params
+
+    // Validate the request
+    const { error } = ByIdAndCustomerIdRequest().validate({ customer_id, id })
+
+    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
+
+    try {
+      await orderModel.delete(id)
+
+      return res.status(httpStatus.OK).json(okResponse('Order deleted successfully'))
+    } catch (error) {
+      // console.log(error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
+    }
+  }
 }
 
 const orderModel = new OrderModel('orders')
