@@ -46,7 +46,13 @@ class AuthorRequestModel extends BaseModel {
           } else {
             await connection.query('UPDATE books SET author_request_status = none WHERE id = ?', data.book_id)
           }
-        } 
+        } else {
+          if (requestType === 'delete' || requestType === 'update') {
+            await connection.query('UPDATE books SET author_request_status = pending WHERE id = ?', data.book_id)
+          } else if (requestType === 'create') {
+            await connection.query('DELETE FROM books WHERE id = ?', data.book_id)
+          }
+        }
 
         await connection.commit()
         return { id, ...data }
