@@ -41,7 +41,7 @@ router.delete('/books/:id', bookController.delete) //authMiddleware, adminMiddle
 // Admin with Authors
 router.get('/authors', authorController.readAll) // authMiddleware, adminMiddleware, 
 router.get('/authors/:id', authorController.readById) //authMiddleware, adminMiddleware,
-router.delete('/author/:id', authorController.delete) //authMiddleware, adminMiddleware, 
+router.delete('/author/:id', authorController.deleteAuthor) //authMiddleware, adminMiddleware, 
 
 // Admin with Authors Requests
 router.get('/author-requests', authorRequestController.readAll) // authMiddleware, adminMiddleware,

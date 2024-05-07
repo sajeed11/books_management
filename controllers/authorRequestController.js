@@ -53,7 +53,7 @@ class AuthorRequestController extends BaseController {
 
         let result = {}
         const requestType = authorRequest.request_type
-        console.log('Request type:', requestType)
+        // console.log('Request type:', requestType)
 
         result = await this.model.interactAuthorRequest(id, data, requestType)
 

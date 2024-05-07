@@ -8,6 +8,11 @@ class AuthorController extends BaseController {
     super(model)
     autoBind(this)
   }
+
+
+  async deleteAuthor(req, res) {
+    
+  }
 }
 const authorModel = new AuthorModel('authors')
 
