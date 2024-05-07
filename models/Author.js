@@ -43,6 +43,31 @@ class AuthorModel extends BaseModel {
       connection.release()
     }
   }
+
+  async deleteAuthor(id) {
+    const connection = await this.getConnection()
+
+    try {
+      await connection.beginTransaction()
+
+      try {
+        await connection.query('DELETE FROM authors WHERE id = ?', [id])
+
+        await connection.query('DELETE FROM books WHERE author_id = ?', [id])
+        await connection.commit()
+
+        return true
+      } catch (error) {
+        await connection.rollback()
+        throw error
+      } finally {
+        connection.release()
+      }
+    } catch (error) {
+      console.error('Error deleting author:', error)
+      throw error
+    }
+  }
 }
 
 export default AuthorModel
