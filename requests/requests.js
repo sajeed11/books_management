@@ -80,6 +80,7 @@ export function CreateOrderRequestSchema() {
   return Joi.object({
     book_id: Joi.number().required(),
     customer_id: Joi.number().required(),
+    quantity: Joi.number().required()
   })
 }
 

@@ -72,6 +72,7 @@ class OrderController extends BaseController {
     const data = {
       book_id: req.body.book_id,
       customer_id: req.body.customer_id,
+      quantity: req.body.quantity,
       status: 'pending',
     }
 
@@ -89,7 +90,11 @@ class OrderController extends BaseController {
         try {
           const result = await orderModel.create(data)
 
-          await bookModel.update(data.book_id, { stock_quantity: book[0].stock_quantity - 1 })
+          if (book[0].stock_quantity < data.quantity) {
+            await connection.rollback()
+            return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse('The book is out of stock'))
+          }
+          await bookModel.update(data.book_id, { stock_quantity: book[0].stock_quantity - data.quantity })
 
           await connection.commit()
           return res.status(httpStatus.CREATED).json(okResponse(result))
