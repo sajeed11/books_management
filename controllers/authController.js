@@ -76,7 +76,7 @@ class AuthController {
       res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
 
       // create an admin token
-      if (result[0].role === 'admin') {
+      if (result.role === 'admin') {
         const adminToken = createToken(result[0].id, process.env.ADMIN_JWT_SECRET)
         res.cookie('admin_jwt', adminToken, { httpOnly: true, maxAge: maxAge * 1000 })
         // console.log('admin token created')
@@ -84,7 +84,6 @@ class AuthController {
 
       return res.status(httpStatus.OK).json(okResponse(result))
     } catch (error) {
-      // 
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse('Invalid credentials'))
     }
   }

@@ -50,7 +50,15 @@ class UserModel extends BaseModel {
       if (user.length > 0) {
         const auth = await bcrypt.compare(data.password, user[0].password)
         if (auth) {
-          return user
+          const res_data = {
+            id: user[0].id,
+            username: user[0].username,
+            email: user[0].email,
+            role: user[0].role
+          }
+
+          console.log(res_data)
+          return res_data
         } else {
           throw new Error('Incorrect password')
         }
