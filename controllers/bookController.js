@@ -36,7 +36,9 @@ class BookController extends BaseController {
     // Validate the request body
     const { error } = createBookRequestSchema().validate(data)
 
-    if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
+    if (error)
+      if (data.picture) removeFile(data.picture)
+    return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     try {
       let result = {}

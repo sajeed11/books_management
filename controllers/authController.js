@@ -72,7 +72,8 @@ class AuthController {
     try {
       const result = await userModel.loginUser(data)
 
-      const token = createToken(result[0].id, process.env.JWT_SECRET)
+
+      const token = createToken(result.id, process.env.JWT_SECRET)
       res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
 
       // create an admin token
