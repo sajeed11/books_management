@@ -53,7 +53,14 @@ class AuthorModel extends BaseModel {
       try {
         await connection.query('DELETE FROM authors WHERE id = ?', [id])
 
+        await connection.query('DELETE FROM author_requests WHERE author_id = ?', [id])
+
+        const user = await connection.query('SELECT user_id FROM authors WHERE id = ?', [id])
+        await connection.query('DELETE FROM users WHERE id = ?', [user[0][0].user_id])
+
         await connection.query('DELETE FROM books WHERE author_id = ?', [id])
+
+        // He will dispear literally XD
         await connection.commit()
 
         return true
