@@ -84,8 +84,8 @@ class AuthController {
 
       return res.status(httpStatus.OK).json(okResponse(result))
     } catch (error) {
-      // console.log('Error on login:', error)
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
+      // 
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse('Invalid credentials'))
     }
   }
 

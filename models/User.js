@@ -28,7 +28,7 @@ class UserModel extends BaseModel {
         }
 
         await connection.commit()
-        return true
+        return { userId, username: userData.username, email: userData.email, role: userData.role }
       } catch (error) {
         await connection.rollback()
         throw error
@@ -56,7 +56,6 @@ class UserModel extends BaseModel {
         }
       }
     } catch (error) {
-      console.error('Error reading data:', error)
       throw error
     } finally {
       connection.release()

@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
+import httpStatus from 'http-status';
+import { clientErrorResponse } from '../helpers/handleErrorResponse.js';
 
 dotenv.config();
 
@@ -10,13 +12,13 @@ const authMiddleware = (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
       if (err) {
-        res.redirect('login');
+        res.status(httpStatus.UNAUTHORIZED).json(clientErrorResponse('Please login to view this page'));
       } else {
         next();
       }
     })
   } else {
-    res.redirect('login');
+    res.status(httpStatus.UNAUTHORIZED).json(clientErrorResponse('Please login to view this page'));
   }
 }
 

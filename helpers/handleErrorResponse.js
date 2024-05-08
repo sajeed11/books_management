@@ -28,13 +28,22 @@ export function clientErrorResponse(error) {
 }
 
 export function serverErrorResponse(error) {
-  return {
-    success: false,
-    error: {
-      message: error.sqlMessage,
-      code: error.code
+  if (error instanceof Error) {
+    return {
+      success: false,
+      error: {
+        message: error.sqlMessage,
+        code: error.code
+      }
     }
-  };
+  } else if (typeof error === 'string') {
+    return {
+      success: false,
+      error: {
+        message: error
+      }
+    }
+  }
 }
 
 // When no data
