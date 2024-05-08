@@ -7,6 +7,7 @@ import { ByIdRequest } from "../requests/requests.js";
 import AuthorRequestModel from "../models/AuthorRequest.js";
 import { clientErrorResponse, notFoundResponse, serverErrorResponse } from "../helpers/handleErrorResponse.js";
 import { okResponse } from "../helpers/handleOkResponse.js";
+import { removeFile } from "../helpers/removeFile.js";
 
 const authorRequestModel = new AuthorRequestModel('author_requests')
 
@@ -50,6 +51,9 @@ class BookController extends BaseController {
       return res.status(httpStatus.CREATED).json(okResponse(result))
     } catch (error) {
       // console.log(error)
+
+      if (data.picture) removeFile(data.picture)
+
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
