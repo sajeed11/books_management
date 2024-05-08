@@ -23,9 +23,6 @@ class AuthController {
 
   // Register user
   static async register(req, res) {
-    // Check if request method is POST
-    if (req.method !== 'POST') return res.status(httpStatus.TEMPORARY_REDIRECT).json(clientErrorResponse('Please register'))
-
     // Validate request
     const { error } = registerRequestSchema().validate(req.body);
 
@@ -61,8 +58,6 @@ class AuthController {
   }
   // Login user
   static async login(req, res) {
-    if (req.method !== 'POST') return res.status(httpStatus.TEMPORARY_REDIRECT).json(clientErrorResponse('Please login'))
-
     // Validate request 
     const { error } = loginRequestSchema().validate(req.body)
 

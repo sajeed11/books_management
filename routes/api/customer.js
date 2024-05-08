@@ -14,8 +14,6 @@ import beforeAuthMiddleware from '../../middlewares/beforeAuth.js';
 const router = express.Router();
 
 // Auth routes
-router.get('/register', authController.register);
-router.get('/login', authController.login);
 router.post('/register', authController.register);
 router.post('/login', beforeAuthMiddleware, authController.login);
 router.get('/logout', authController.logout);

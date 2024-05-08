@@ -17,10 +17,8 @@ import { uploadFile } from '../../middlewares/uploadFiles.js';
 const router = express.Router();
 
 // Auth routes
-router.get('/register', authController.register);
-router.get('/login', authController.login);
-router.post('/register', authController.register);
-router.post('/login', authController.login); // beforeAuthMiddleware
+router.post('/register', authController.register)
+router.post('/login', authController.login) // beforeAuthMiddleware
 router.get('/logout', authController.logout)
 
 // Admin with Users
