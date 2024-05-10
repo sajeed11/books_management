@@ -1,4 +1,4 @@
-// Here we define helpers funcitons to handle errors response
+// Here we define helpers functions to handle errors response
 
 export function clientErrorResponse(error) {
   let errorObj = {};
