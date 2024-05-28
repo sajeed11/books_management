@@ -3,7 +3,7 @@ import httpStatus from "http-status";
 import BaseController from "./baseController.js";
 import OrderModel from "../models/Order.js";
 import BookModel from "../models/Book.js";
-import { ByCustomerIdRequest, CreateOrderRequestSchema, ByIdAndCustomerIdRequest } from "../requests/requests.js";
+import { ByCustomerIdRequest, CreateOrderRequestSchema, ByIdAndCustomerIdRequest, UpdateOrderRequestSchema } from "../requests/requests.js";
 import { clientErrorResponse, notFoundResponse, serverErrorResponse } from "../helpers/handleErrorResponse.js";
 import { okResponse } from "../helpers/handleOkResponse.js";
 
@@ -37,16 +37,16 @@ class OrderController extends BaseController {
 
   // Read an order by id
   async readOwnById(req, res) {
-    const { customer_id, id } = req.params
+    const { customer_id, order_id } = req.params
 
     // Validate the request
-    const { error } = ByIdAndCustomerIdRequest().validate({ customer_id, id })
+    const { error } = ByIdAndCustomerIdRequest().validate({ customer_id, order_id })
 
     if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
 
     try {
-      const data = await orderModel.readById(id)
+      const data = await orderModel.readById(order_id)
 
       if (!data) {
         return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
@@ -71,7 +71,7 @@ class OrderController extends BaseController {
 
     const data = {
       book_id: req.body.book_id,
-      customer_id: req.body.customer_id,
+      customer_id: req.params.customer_id,
       quantity: req.body.quantity,
       status: 'pending',
     }
@@ -83,50 +83,51 @@ class OrderController extends BaseController {
       const book = await bookModel.readById(data.book_id)
 
       if (!book) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
+    } catch (error) {
+      // console.log(error)
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
+    }
 
-      try {
-        await connection.beginTransaction()
+    try {
+      const result = await orderModel.create(data)
 
-        try {
-          const result = await orderModel.create(data)
-
-          if (book[0].stock_quantity < data.quantity) {
-            await connection.rollback()
-            return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse('The book is out of stock'))
-          }
-          await bookModel.update(data.book_id, { stock_quantity: book[0].stock_quantity - data.quantity })
-
-          await connection.commit()
-          return res.status(httpStatus.CREATED).json(okResponse(result))
-        } catch (error) {
-          await connection.rollback()
-          return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
-        } finally {
-          connection.release()
-        }
-      } catch (error) {
-        // console.log(error)
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
+      if (book[0].stock_quantity < data.quantity) {
+        await connection.rollback()
+        return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse('The book is out of stock'))
       }
+      return res.status(httpStatus.CREATED).json(okResponse(result))
     } catch (error) {
       // console.log(error)
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
     }
   }
 
-  // Delete an order
-  async deleteOwnById(req, res) {
-    const { customer_id, id } = req.params
+  // Admin functionality: update the order by set the status of it
+  // If he want to approve the order: status = 'approved' and we make editing on the quantity of the book
+  // If he want to reject the order: status = 'rejected' and we delete the order
+  async updateOrder(req, res) {
+    const { order_id } = req.params
+    const data = req.body
 
     // Validate the request
-    const { error } = ByIdAndCustomerIdRequest().validate({ customer_id, id })
+    const { error } = UpdateOrderRequestSchema().validate(req.body)
 
     if (error) return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse(error))
 
     try {
-      await orderModel.delete(id)
+      const order = await orderModel.readById(order_id)
 
-      return res.status(httpStatus.OK).json(okResponse('Order deleted successfully'))
+      if (!order) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
+
+      orderModel.update(order_id, data)
+
+      if (data.status === 'approved') {
+        await bookModel.update(order[0].book_id, order[0].quantity)
+      } else {
+        await orderModel.delete(order_id)
+      }
+
+      return res.status(httpStatus.OK).json(okResponse('Order updated successfully'))
     } catch (error) {
       // console.log(error)
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
