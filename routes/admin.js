@@ -1,18 +1,18 @@
 import express from 'express';
 
 // Controllers
-import authController from '../../controllers/authController.js';
-import userController from '../../controllers/userController.js';
-import bookController from '../../controllers/bookController.js';
-import authorController from '../../controllers/authorController.js';
-import genreController from '../../controllers/genreController.js';
-import authorRequestController from '../../controllers/authorRequestController.js';
+import authController from '../controllers/authController.js';
+import userController from '../controllers/userController.js';
+import bookController from '../controllers/bookController.js';
+import authorController from '../controllers/authorController.js';
+import genreController from '../controllers/genreController.js';
+import authorRequestController from '../controllers/authorRequestController.js';
 
 // Middlewares
-import authMiddleware from '../../middlewares/authMiddleware.js';
-import adminMiddleware from '../../middlewares/adminMiddleware.js';
-import beforeAuthMiddleware from '../../middlewares/beforeAuth.js';
-import { uploadFile } from '../../middlewares/uploadFiles.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
+import adminMiddleware from '../middlewares/adminMiddleware.js';
+import beforeAuthMiddleware from '../middlewares/beforeAuth.js';
+import { uploadFile } from '../middlewares/uploadFiles.js';
 
 const router = express.Router();
 
