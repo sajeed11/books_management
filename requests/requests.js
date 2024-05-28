@@ -79,8 +79,13 @@ export function ApprovingRequestData() {
 export function CreateOrderRequestSchema() {
   return Joi.object({
     book_id: Joi.number().required(),
-    customer_id: Joi.number().required(),
     quantity: Joi.number().required()
+  })
+}
+
+export function UpdateOrderRequestSchema() {
+  return Joi.object({
+    status: Joi.string().valid('approved', 'rejected').required()
   })
 }
 

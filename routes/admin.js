@@ -6,6 +6,7 @@ import userController from '../controllers/userController.js';
 import bookController from '../controllers/bookController.js';
 import authorController from '../controllers/authorController.js';
 import genreController from '../controllers/genreController.js';
+import orderController from '../controllers/orderController.js';
 import authorRequestController from '../controllers/authorRequestController.js';
 
 // Middlewares
@@ -35,6 +36,11 @@ router.post('/books', authMiddleware, uploadFile.single('picture'), bookControll
 // router.put('/books/:id', bookController.approveBook) //authMiddleware, adminMiddleware,
 // when the admin forcibly want to delete the author request
 router.delete('/books/:id', bookController.delete) //authMiddleware, adminMiddleware,
+
+// Admin with Orders
+router.get('/orders', orderController.readAll) // authMiddleware, adminMiddleware,
+router.get('/orders/:id', orderController.readById) // authMiddleware, adminMiddleware,
+router.post('/orders/:order_id', orderController.updateOrder) // authMiddleware, adminMiddleware,
 
 // Admin with Authors
 router.get('/authors', authorController.readAll) // authMiddleware, adminMiddleware, 

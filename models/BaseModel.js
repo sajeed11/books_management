@@ -59,7 +59,7 @@ class BaseModel {
       const params = [this.tableName, id];
 
       if (condition) {
-        query += `AND ?`
+        query += ` AND ?`
         params.push(condition)
       }
 

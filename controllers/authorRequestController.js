@@ -48,18 +48,18 @@ class AuthorRequestController extends BaseController {
 
       if (!authorRequest) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
 
+
       try {
         // const result = await this.model.approveAuthorRequest(id, data)
-
         let result = {}
-        const requestType = authorRequest.request_type
-        // console.log('Request type:', requestType)
+
+        const requestType = authorRequest[0].request_type
 
         result = await this.model.interactAuthorRequest(id, data, requestType)
 
         return res.status(httpStatus.OK).json(okResponse(result))
       } catch (error) {
-        // console.error('Error approving author request:', error);
+        console.error('Error approving author request:', error);
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
       }
     } catch (error) {

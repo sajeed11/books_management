@@ -53,7 +53,7 @@ class BaseController {
         data = await this.model.readById(id, { author_request_status: 'none' })
       } else data = await this.model.readById(id);
 
-      if (!data.length) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
+      if (!data) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
 
       return res.status(httpStatus.OK).json(okResponse(data))
     } catch (error) {

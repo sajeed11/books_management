@@ -165,7 +165,7 @@ class BookModel extends BaseModel {
                   LEFT JOIN genres g ON b.genre_id = g.id
                   WHERE 1 = 1`;
 
-    let conditions = ['b.author_request_status = "none"']
+    let conditions = ['b.author_request_status = "ready"']
 
     if (title) {
       conditions.push(`b.title LIKE '%${title}%'`);

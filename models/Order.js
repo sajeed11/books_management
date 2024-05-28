@@ -10,6 +10,19 @@ class OrderModel extends BaseModel {
     autoBind(this)
   }
 
+  // Cancel an order
+  // async cancel(id) {
+  //   const connection = await this.getConnection()
+
+  //   try {
+
+  //   } catch (error) {
+  //     console.log('Error canceling order:', error)
+  //     throw error
+  //   } finally {
+  //     connection.release()
+  //   }
+  // }
 }
 
 export default OrderModel

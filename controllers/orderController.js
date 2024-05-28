@@ -80,22 +80,24 @@ class OrderController extends BaseController {
 
     // We check if the book exists then if it not approved yet
     try {
-      const book = await bookModel.readById(data.book_id)
+      const book = await bookModel.readById(data.book_id, { author_request_status: 'ready' })
+      console.log(book)
 
       if (!book) return res.status(httpStatus.NOT_FOUND).json(notFoundResponse())
-    } catch (error) {
-      // console.log(error)
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
-    }
 
-    try {
-      const result = await orderModel.create(data)
 
-      if (book[0].stock_quantity < data.quantity) {
-        await connection.rollback()
-        return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse('The book is out of stock'))
+      try {
+        const result = await orderModel.create(data)
+
+        if (book[0].stock_quantity < data.quantity) {
+          await connection.rollback()
+          return res.status(httpStatus.BAD_REQUEST).json(clientErrorResponse('The book is out of stock'))
+        }
+        return res.status(httpStatus.CREATED).json(okResponse(result))
+      } catch (error) {
+        // console.log(error)
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
       }
-      return res.status(httpStatus.CREATED).json(okResponse(result))
     } catch (error) {
       // console.log(error)
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(serverErrorResponse(error))
@@ -121,8 +123,10 @@ class OrderController extends BaseController {
 
       orderModel.update(order_id, data)
 
+      const book = await bookModel.readById(order[0].book_id)
+
       if (data.status === 'approved') {
-        await bookModel.update(order[0].book_id, order[0].quantity)
+        await bookModel.update(order[0].book_id, { stock_quantity: book[0].stock_quantity - order[0].quantity })
       } else {
         await orderModel.delete(order_id)
       }

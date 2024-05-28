@@ -44,11 +44,11 @@ class AuthorRequestModel extends BaseModel {
             // Archiving the deleted book
             await connection.query('INSERT INTO archived_books SET title = ?, author_id = ?, isbn = ?, picture = ?, stock_quantity = ?, price = ?, genre_id = ?, publication_date = ?', [book.title, book.author_id, book.isbn, book.picture, book.stock_quantity, book.price, book.genre_id, book.publication_date])
           } else {
-            await connection.query('UPDATE books SET author_request_status = none WHERE id = ?', data.book_id)
+            await connection.query('UPDATE books SET author_request_status = "ready" WHERE id = ?', data.book_id)
           }
         } else {
           if (requestType === 'delete' || requestType === 'update') {
-            await connection.query('UPDATE books SET author_request_status = pending WHERE id = ?', data.book_id)
+            await connection.query('UPDATE books SET author_request_status = "pending" WHERE id = ?', data.book_id)
           } else if (requestType === 'create') {
             await connection.query('DELETE FROM books WHERE id = ?', data.book_id)
           }
