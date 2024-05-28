@@ -1,9 +1,9 @@
 import express from "express"
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import customerRoutes from './routes/api/customer.js'
-import adminRoutes from './routes/api/admin.js'
-import authorRoutes from './routes/api/author.js'
+import customerRoutes from './routes/customer.js'
+import adminRoutes from './routes/admin.js'
+import authorRoutes from './routes/author.js'
 
 // Express app
 const app = express();
